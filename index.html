@@ -2954,13 +2954,9 @@ select.sel{
   <input type="hidden" id="mmId">
   <label class="lbl">Nome completo</label>
   <input class="inp" placeholder="Nome completo" id="mmN">
-  <div class="fg">
-    <div><label class="lbl">Setor</label><select class="sel" id="mmD"><option value="">Selecione o setor...</option>
-<option>NOVOS SISTEMAS</option><option>SIAFIC</option><option>ZapFlow</option><option>FOLHA.AI</option>
-<option>ARRECADA+</option><option>DAE - Gestão Estratégica</option><option>Marketing & Comunicação</option>
-<option>Infraestrutura</option><option>Comercial</option></select></div>
-    <div><label class="lbl">Cargo</label><select class="sel" id="mmC"><option value="">Cargo...</option></select></div>
-  </div>
+  <label class="lbl">Cargo</label>
+  <select class="sel" id="mmC"><option value="">Cargo...</option></select>
+  <input type="hidden" id="mmD" value="DAE">
 
   <!-- CONTATOS — campos essenciais para notificação -->
   <div style="background:linear-gradient(135deg,rgba(14,165,233,.06),rgba(56,189,248,.02));border:1px solid rgba(14,165,233,.18);border-radius:10px;padding:12px;margin-bottom:12px">
@@ -3260,9 +3256,43 @@ document.addEventListener('keypress', e => {
 });
 
 // ── CARREGAR TUDO DO SUPABASE ─────────────────────────────────────
+
+// ══════════════════════════════════════════════════════════════════
+// PERSISTÊNCIA LOCAL — salva dados no navegador quando offline
+// ══════════════════════════════════════════════════════════════════
+function salvarLocal() {
+  try {
+    localStorage.setItem('dae_proj',    JSON.stringify(proj));
+    localStorage.setItem('dae_tar',     JSON.stringify(tar));
+    localStorage.setItem('dae_memb',    JSON.stringify(memb));
+    localStorage.setItem('dae_riscos',  JSON.stringify(riscos));
+    localStorage.setItem('dae_reun',    JSON.stringify(reun));
+    localStorage.setItem('dae_espacos', JSON.stringify(espacos));
+    localStorage.setItem('dae_agenda',  JSON.stringify(agenda));
+    localStorage.setItem('dae_ferias',  JSON.stringify(ferias));
+  } catch(e) { console.warn('localStorage indisponível'); }
+}
+
+function carregarLocal() {
+  try {
+    proj    = JSON.parse(localStorage.getItem('dae_proj')    || '[]');
+    tar     = JSON.parse(localStorage.getItem('dae_tar')     || '[]');
+    memb    = JSON.parse(localStorage.getItem('dae_memb')    || '[]');
+    riscos  = JSON.parse(localStorage.getItem('dae_riscos')  || '[]');
+    reun    = JSON.parse(localStorage.getItem('dae_reun')    || '[]');
+    espacos = JSON.parse(localStorage.getItem('dae_espacos') || '[]');
+    agenda  = JSON.parse(localStorage.getItem('dae_agenda')  || '[]');
+    ferias  = JSON.parse(localStorage.getItem('dae_ferias')  || '[]');
+  } catch(e) { console.warn('Erro ao carregar local'); }
+}
+
 async function loadAll() {
   showLoading(true);
 
+  // SEMPRE carregar localStorage primeiro (garante dados ao atualizar)
+  carregarLocal();
+
+  // Tentar Supabase — só substitui se retornar dados reais
   if (db) {
     try {
       const [pm,tm,mm,fm,rm,rem,am,avm,espm] = await Promise.all([
@@ -3276,17 +3306,20 @@ async function loadAll() {
         safeDb.from('atividades').select('*').order('created_at',{ascending:false}).limit(20),
         safeDb.from('espacos').select('*').order('nome'),
       ]);
-      proj    = pm.data  || [];
-      tar     = tm.data  || [];
-      memb    = mm.data  || [];
-      ferias  = fm.data  || [];
-      riscos  = rm.data  || [];
-      reun    = rem.data || [];
-      agenda  = am.data  || [];
-      ativs   = avm.data || [];
-      espacos = espm.data || [];
+      // Só usar dados do Supabase se retornar algo (evita sobrescrever local com vazio)
+      if (pm.data  && pm.data.length)  { proj    = pm.data;  }
+      if (tm.data  && tm.data.length)  { tar     = tm.data;  }
+      if (mm.data  && mm.data.length)  { memb    = mm.data;  }
+      if (fm.data  && fm.data.length)  { ferias  = fm.data;  }
+      if (rm.data  && rm.data.length)  { riscos  = rm.data;  }
+      if (rem.data && rem.data.length) { reun    = rem.data; }
+      if (am.data  && am.data.length)  { agenda  = am.data;  }
+      if (avm.data && avm.data.length) { ativs   = avm.data; }
+      if (espm.data && espm.data.length){ espacos = espm.data;}
+      // Sincronizar localStorage com dados do Supabase
+      salvarLocal();
     } catch(e) {
-      console.error('Erro ao carregar dados:', e);
+      console.warn('Supabase indisponível, usando dados locais');
     }
   }
 
@@ -5540,16 +5573,23 @@ async function addMember() {
     if (error) { showToast('❌ Erro: ' + error.message); return; }
     const idx = memb.findIndex(m => m.id == id);
     if (idx >= 0) memb[idx] = { ...memb[idx], ...dados };
+    salvarLocal();
     showToast('✅ Membro atualizado!');
   } else {
     // Novo membro
-    const novo = { ...dados, cor: CL[memb.length%CL.length] };
+    const novo = { ...dados, cor: CL[memb.length%CL.length], id: 'local_' + Date.now() };
     const { data, error } = await safeDb.from('membros').insert([novo]).select().single();
-    if (error) { showToast('❌ Erro: ' + error.message); return; }
-    memb.push(data);
+    if (error || !data) {
+      // Supabase indisponível — salvar localmente
+      memb.push(novo);
+    } else {
+      memb.push(data);
+    }
+    salvarLocal();
     showToast('👥 Membro adicionado!');
   }
   closeM('mMember'); renderMembers(); popSels();
+    salvarLocal();
   // Limpar
   ['mmN','mmE','mmW','mmId'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('mMemberTitle').textContent = 'NOVO MEMBRO';
@@ -5805,8 +5845,12 @@ async function addRisk() {
   const p = proj.find(x=>x.nome===projId||x.id===projId);
   const novo = { descricao:d, projeto_id:p?.id||null, sev:document.getElementById('nrS').value, resp:document.getElementById('nrR').value||curUser?.av, status:'aberto' };
   const { data, error } = await safeDb.from('riscos').insert([novo]).select().single();
-  if (error) { showToast('❌ Erro: ' + error.message); return; }
-  riscos.unshift(data);
+  if (error || !data) {
+    riscos.unshift({...novo, id: 'local_' + Date.now()});
+  } else {
+    riscos.unshift(data);
+  }
+  salvarLocal();
   closeM('mRisk'); renderRiscos(); document.getElementById('nrD').value = '';
   showToast('⚠️ Risco registrado!');
 }
