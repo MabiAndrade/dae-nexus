@@ -2594,95 +2594,100 @@ select.sel{
 
     <!-- TIMELINE / GANTT -->
     <div class="tab" id="t-gantt">
-      <div class="ph">
-        <div><div class="pt">TIMELINE</div><div class="ps">Visualização Gantt dos projetos</div></div>
-        <div style="display:flex;gap:8px">
-          <select class="sel" id="ganttFiltro" onchange="renderGantt()" style="font-size:11px;padding:6px 10px">
-            <option value="todos">Todos os projetos</option>
-            <option value="ativos">Somente ativos</option>
-            <option value="atrasados">Somente atrasados</option>
-          </select>
-        </div>
-      </div>
-      <div class="card" style="cursor:default;overflow-x:auto;">
-        <div id="ganttContainer"></div>
-      </div>
+
+<!-- ── TIMELINE CSS ─────────────────────────────── -->
+<style>
+.tl-wrap{padding:0 0 40px;}
+.tl-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.tl-kpi{border-radius:14px;padding:16px 18px;color:#fff;position:relative;overflow:hidden;}
+.tl-kpi::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.08);}
+.tl-kpi-num{font-size:32px;font-weight:900;line-height:1;}
+.tl-kpi-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.8;margin-top:4px;}
+.tl-filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
+.tl-search{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:8px 13px;flex:1;min-width:200px;}
+.tl-search input{flex:1;border:none;background:transparent;outline:none;font-family:var(--fb);font-size:13px;color:var(--tx);}
+.tl-search input::placeholder{color:var(--tx4);}
+.tl-sel{background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:8px 13px;font-family:var(--fb);font-size:12px;color:var(--tx);outline:none;cursor:pointer;}
+.tl-sel:focus{border-color:var(--brand);}
+.tl-board{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.tl-header{display:flex;align-items:center;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);gap:8px;}
+.tl-col-label{width:220px;flex-shrink:0;font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;}
+.tl-months{flex:1;display:flex;position:relative;overflow:hidden;}
+.tl-month{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;position:absolute;}
+.tl-proj-group{border-bottom:1px solid var(--border);}
+.tl-proj-group:last-child{border-bottom:none;}
+.tl-proj-header{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface2);cursor:pointer;transition:background .15s;}
+.tl-proj-header:hover{background:var(--brand-light);}
+.tl-proj-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.tl-proj-name{font-size:13px;font-weight:700;color:var(--tx);flex:1;}
+.tl-proj-prog{font-size:11px;color:var(--tx3);font-weight:600;}
+.tl-task-row{display:flex;align-items:center;padding:7px 16px;transition:background .15s;cursor:pointer;border-top:1px solid var(--border);}
+.tl-task-row:hover{background:var(--surface2);}
+.tl-task-label{width:220px;flex-shrink:0;padding-right:16px;}
+.tl-task-name{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tl-task-meta{font-size:10px;color:var(--tx3);margin-top:2px;}
+.tl-task-bar-wrap{flex:1;position:relative;height:32px;}
+.tl-bar{position:absolute;top:4px;height:24px;border-radius:6px;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;transition:opacity .2s;cursor:grab;box-shadow:0 2px 6px rgba(0,0,0,0.15);}
+.tl-bar:hover{opacity:.85;transform:translateY(-1px);}
+.tl-bar:active{cursor:grabbing;}
+.tl-bar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:rgba(255,255,255,0.2);}
+.tl-bar-txt{position:relative;z-index:1;font-size:10px;font-weight:700;color:#fff;}
+.tl-today{position:absolute;top:0;bottom:0;width:2px;background:rgba(239,68,68,0.7);z-index:10;pointer-events:none;}
+.tl-today::before{content:'hoje';position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:700;color:#EF4444;white-space:nowrap;}
+.tl-grid-line{position:absolute;top:0;bottom:0;width:1px;background:var(--border);z-index:0;pointer-events:none;}
+.tl-empty{text-align:center;padding:40px;color:var(--tx3);}
+/* Status cores */
+.tl-atrasado{background:linear-gradient(135deg,#EF4444,#DC2626);}
+.tl-andamento{background:linear-gradient(135deg,#F59E0B,#D97706);}
+.tl-planejado{background:linear-gradient(135deg,#3B82F6,#2563EB);}
+.tl-concluido{background:linear-gradient(135deg,#10B981,#059669);}
+@media(max-width:767px){
+  .tl-kpis{grid-template-columns:1fr 1fr;}
+  .tl-col-label{width:140px;}
+  .tl-task-label{width:140px;}
+}
+</style>
+
+<div class="tl-wrap">
+
+  <!-- KPIs -->
+  <div class="tl-kpis" id="tlKpis"></div>
+
+  <!-- FILTROS -->
+  <div class="tl-filters">
+    <div class="tl-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="tlBusca" placeholder="Buscar tarefa ou projeto..." oninput="renderTimeline()">
     </div>
+    <select class="tl-sel" id="tlFiltroStatus" onchange="renderTimeline()">
+      <option value="">Todos os status</option>
+      <option value="atrasado">Atrasado</option>
+      <option value="andamento">Em andamento</option>
+      <option value="planejado">Planejado</option>
+      <option value="concluido">Concluído</option>
+    </select>
+    <select class="tl-sel" id="tlFiltroResp" onchange="renderTimeline()">
+      <option value="">Todos os responsáveis</option>
+    </select>
+    <select class="tl-sel" id="tlFiltroPer" onchange="renderTimeline()">
+      <option value="mes">Este mês</option>
+      <option value="tri">Trimestre</option>
+      <option value="sem">Semestre</option>
+      <option value="ano">Ano inteiro</option>
+    </select>
+  </div>
 
-    <!-- PAINEL ESTRATÉGICO -->
-    <div class="tab" id="t-painel">
-      <div class="page-header">
-        <div class="page-title">Painel Estratégico</div>
-        <div class="page-sub">Indicadores de performance e BI</div>
-      </div>
-      <div class="ph"><div><div class="pt">PAINEL ESTRATÉGICO</div><div class="ps">Visão executiva do portfólio</div></div></div>
-
-      <!-- FILTRO DE PERÍODO -->
-      <div class="period-chips" id="periodChips">
-        <button class="period-chip on" onclick="setPeriod('tudo',this)">Tudo</button>
-        <button class="period-chip" onclick="setPeriod('semana',this)">Esta semana</button>
-        <button class="period-chip" onclick="setPeriod('mes',this)">Este mês</button>
-        <button class="period-chip" onclick="setPeriod('trimestre',this)">Trimestre</button>
-      </div>
-
-      <!-- KPIs -->
-      <div class="stats" style="margin-bottom:14px" id="painelKPIs"></div>
-
-      <!-- LINHA 1: produtividade + distribuição -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-        <div class="card" style="cursor:default">
-          <div class="sl" style="margin:0 0 12px">🏆 Top Colaboradores</div>
-          <div id="painelTop"></div>
-        </div>
-        <div class="card" style="cursor:default">
-          <div class="sl" style="margin:0 0 12px">📦 Projetos por Setor</div>
-          <div id="painelSetor"></div>
-        </div>
-      </div>
-
-      <!-- PREVISÃO IA -->
-      <div class="card" style="cursor:default;margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="sl" style="margin:0">🤖 Previsão de Atrasos (IA)</div>
-          <button class="btnadd" onclick="rodarPrevisaoIA()">Atualizar análise</button>
-        </div>
-        <div id="painelPrevisao"><div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Clique em "Atualizar análise" para gerar previsões</div></div>
-      </div>
-
-      <!-- TEMPO MÉDIO ENTREGA -->
-      <div class="card" style="cursor:default">
-        <div class="sl" style="margin:0 0 12px">⏱️ Métricas de Entrega</div>
-        <div id="painelMetricas"></div>
-      </div>
+  <!-- BOARD -->
+  <div class="tl-board">
+    <div class="tl-header">
+      <div class="tl-col-label">Tarefa / Projeto</div>
+      <div class="tl-months" id="tlMonths"></div>
     </div>
+    <div id="tlBoard"></div>
+  </div>
 
-    <!-- NOVA IA -->
-    <div class="tab" id="t-nova">
-      <div class="page-header">
-        <div class="page-title">Nova IA</div>
-        <div class="page-sub">Assistente inteligente com análise preditiva</div>
-      </div>
-      <div class="novahdr">
-        <div class="novaav" style="font-family:var(--fh);font-size:13px;letter-spacing:1px">IA</div>
-        <div class="novanm">NOVA IA</div>
-        <div class="novads">Assistente inteligente · Dados reais em tempo real</div>
-      </div>
-      <div class="nsugs" id="novaS">
-        <button class="nsug" onclick="askNova(this.textContent)">Status geral do portfólio</button>
-        <button class="nsug" onclick="askNova(this.textContent)">Projetos atrasados e riscos</button>
-        <button class="nsug" onclick="askNova(this.textContent)">🔥 Tarefas urgentes desta semana</button>
-        <button class="nsug" onclick="askNova(this.textContent)">👥 Quem tem mais tarefas abertas?</button>
-        <button class="nsug" onclick="gerarTarefasIA()">Gerar tarefas para projeto</button>
-        <button class="nsug" onclick="preverAtrasos()">Prever atrasos nos projetos</button>
-        <button class="nsug" onclick="sugerirRiscos()">Sugerir riscos não mapeados</button>
-        <button class="nsug" onclick="askNova(this.textContent)">📅 Agenda e compromissos</button>
-      </div>
-      <div class="nmsgs" id="novaMsgs"></div>
-      <div class="novain">
-        <textarea class="novainp" rows="1" placeholder="Pergunte sobre os projetos..." id="novaInp" onkeypress="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendNova();}"></textarea>
-        <button class="novasnd" onclick="sendNova()">✦</button>
-      </div>
-    </div>
+</div>
+</div>
 
 <div class="tab" id="t-meuespaco">
   <div class="ph">
@@ -6416,72 +6421,210 @@ async function calcularProgressoAuto(projetoId) {
 }
 
 // ══ GANTT / TIMELINE ═══════════════════════════════════════════
-function renderGantt() {
-  const filtro = document.getElementById('ganttFiltro')?.value || 'todos';
+function renderGantt() { renderTimeline(); }
+
+function renderTimeline() {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
-  let lista = [...proj];
-  if (filtro === 'ativos') lista = lista.filter(p => p.status !== 'concluido');
-  if (filtro === 'atrasados') lista = lista.filter(p => p.fim && new Date(p.fim) < hoje);
-  lista = lista.filter(p => p.fim); // só projetos com prazo
+  const busca   = (document.getElementById('tlBusca')?.value || '').toLowerCase();
+  const fStatus = document.getElementById('tlFiltroStatus')?.value || '';
+  const fResp   = document.getElementById('tlFiltroResp')?.value   || '';
+  const fPer    = document.getElementById('tlFiltroPer')?.value    || 'tri';
 
-  const el = document.getElementById('ganttContainer');
-  if (!el) return;
-  if (!lista.length) { el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--tx3)">Nenhum projeto com prazo definido</div>'; return; }
-
-  // Calcular range de datas
-  const datas = lista.flatMap(p => [new Date(p.inicio||p.created_at||hoje), new Date(p.fim)]);
-  const minD = new Date(Math.min(...datas.map(d=>d.getTime())));
-  const maxD = new Date(Math.max(...datas.map(d=>d.getTime())));
-  minD.setDate(1);
-  maxD.setMonth(maxD.getMonth()+1); maxD.setDate(1);
-  const totalDias = Math.max(1, Math.ceil((maxD - minD) / 86400000));
-
-  // Montar meses no header
-  const meses = [];
-  let cur = new Date(minD);
-  while (cur < maxD) {
-    meses.push({ label: cur.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}), pos: Math.round((cur-minD)/86400000/totalDias*100) });
-    cur.setMonth(cur.getMonth()+1);
+  // Popular select de responsáveis
+  const selResp = document.getElementById('tlFiltroResp');
+  if (selResp && selResp.options.length <= 1) {
+    memb.forEach(m => {
+      const o = document.createElement('option');
+      o.value = m.av; o.textContent = m.nome?.split(' ')[0] || m.av;
+      selResp.appendChild(o);
+    });
   }
 
-  const hojePos = Math.min(100, Math.max(0, Math.round((hoje-minD)/86400000/totalDias*100)));
+  // Range de datas por período
+  const periodos = { mes:1, tri:3, sem:6, ano:12 };
+  const mesesRange = periodos[fPer] || 3;
+  const minD = new Date(hoje); minD.setDate(1);
+  const maxD = new Date(minD); maxD.setMonth(maxD.getMonth() + mesesRange);
 
-  let html = `<div style="min-width:600px">
-    <div style="display:flex;margin-bottom:4px;padding-left:180px;position:relative;height:20px">
-      ${meses.map(m=>`<div style="position:absolute;left:calc(180px + ${m.pos}%);font-size:9px;color:var(--tx3);white-space:nowrap">${m.label}</div>`).join('')}
-    </div>
-    <div style="position:relative;padding-left:180px;border-left:1px solid var(--br)">
-      <div style="position:absolute;left:calc(180px + ${hojePos}%);top:0;bottom:0;width:2px;background:rgba(201,146,10,0.5);z-index:2" title="Hoje"></div>
-  `;
+  // Status da tarefa
+  const getStatus = (t) => {
+    if (t.ok || t.status === 'feito' || t.status === 'concluido') return 'concluido';
+    if (t.prazo && new Date(t.prazo) < hoje) return 'atrasado';
+    if (t.status === 'em andamento') return 'andamento';
+    return 'planejado';
+  };
+  const statusClass = { atrasado:'tl-atrasado', andamento:'tl-andamento', planejado:'tl-planejado', concluido:'tl-concluido' };
+  const statusLabel = { atrasado:'Atrasado', andamento:'Em andamento', planejado:'Planejado', concluido:'Concluído' };
 
-  lista.forEach((p,i) => {
-    const inicio = new Date(p.inicio || p.created_at || minD);
-    const fim = new Date(p.fim);
-    const left = Math.max(0, Math.round((inicio-minD)/86400000/totalDias*100));
-    const width = Math.max(2, Math.round((fim-inicio)/86400000/totalDias*100));
-    const atrasado = fim < hoje && p.status !== 'concluido';
-    const cor = atrasado ? '#EF4444' : CL[i%CL.length];
-    const diasRestantes = Math.ceil((fim-hoje)/86400000);
-    const label = atrasado ? `${Math.abs(diasRestantes)}d atrasado` : `${diasRestantes}d restantes`;
-    const tarefasPj = tar.filter(t=>t.projeto_id===p.id);
-    const progReal = tarefasPj.length ? Math.round(tarefasPj.filter(t=>t.ok).length/tarefasPj.length*100) : (p.prog||0);
-
-    html += `<div style="display:flex;align-items:center;margin-bottom:8px;height:32px">
-      <div style="width:180px;padding-right:10px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0" title="${p.nome}">${p.nome}</div>
-      <div style="flex:1;position:relative;height:100%">
-        <div style="position:absolute;left:${left}%;width:${width}%;height:22px;top:5px;background:${cor}22;border:1px solid ${cor};border-radius:4px;overflow:hidden;cursor:pointer" onclick="showToast('${p.nome}: ${progReal}% · ${label}')">
-          <div style="height:100%;width:${progReal}%;background:${cor};opacity:.7;border-radius:3px 0 0 3px"></div>
-          <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 6px;font-size:9px;font-weight:700;color:#fff;white-space:nowrap">${p.nome.split(' ')[0]} ${progReal}%</div>
-        </div>
-      </div>
-    </div>`;
+  // Filtrar tarefas
+  let tarefasFiltradas = tar.filter(t => {
+    if (fStatus && getStatus(t) !== fStatus) return false;
+    if (fResp && t.resp !== fResp) return false;
+    if (busca && !t.titulo?.toLowerCase().includes(busca)) return false;
+    return true;
   });
 
-  html += `</div></div>`;
-  el.innerHTML = html;
+  // KPIs
+  const total     = tar.length;
+  const atrasadas = tar.filter(t => getStatus(t) === 'atrasado').length;
+  const andamento = tar.filter(t => getStatus(t) === 'andamento').length;
+  const concluidas= tar.filter(t => getStatus(t) === 'concluido').length;
+  const progGeral = total ? Math.round((concluidas / total) * 100) : 0;
+
+  const kpisEl = document.getElementById('tlKpis');
+  if (kpisEl) kpisEl.innerHTML = `
+    <div class="tl-kpi" style="background:linear-gradient(135deg,#4F46E5,#7C3AED)">
+      <div class="tl-kpi-num">${progGeral}%</div>
+      <div class="tl-kpi-lbl">Progresso Geral</div>
+    </div>
+    <div class="tl-kpi" style="background:linear-gradient(135deg,#EF4444,#DC2626)">
+      <div class="tl-kpi-num">${atrasadas}</div>
+      <div class="tl-kpi-lbl">Atrasadas</div>
+    </div>
+    <div class="tl-kpi" style="background:linear-gradient(135deg,#F59E0B,#D97706)">
+      <div class="tl-kpi-num">${andamento}</div>
+      <div class="tl-kpi-lbl">Em Andamento</div>
+    </div>
+    <div class="tl-kpi" style="background:linear-gradient(135deg,#10B981,#059669)">
+      <div class="tl-kpi-num">${concluidas}</div>
+      <div class="tl-kpi-lbl">Concluídas</div>
+    </div>`;
+
+  // Meses no header
+  const totalDias = Math.ceil((maxD - minD) / 86400000);
+  const monthsEl = document.getElementById('tlMonths');
+  if (monthsEl) {
+    let mHtml = '<div style="position:relative;width:100%;height:28px;">';
+    let cur = new Date(minD);
+    while (cur < maxD) {
+      const pct = Math.round((cur - minD) / 86400000 / totalDias * 100);
+      mHtml += `<span class="tl-month" style="left:${pct}%">${cur.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).toUpperCase()}</span>`;
+      cur.setMonth(cur.getMonth() + 1);
+    }
+    mHtml += '</div>';
+    monthsEl.innerHTML = mHtml;
+  }
+
+  // Agrupar por projeto
+  const grupos = {};
+  tarefasFiltradas.forEach(t => {
+    const p = proj.find(x => x.id === t.projeto_id);
+    const key = p ? p.id : 'sem_projeto';
+    const nome = p ? (p.nome || 'Projeto') : 'Sem projeto';
+    if (!grupos[key]) grupos[key] = { nome, projeto: p, tarefas: [] };
+    grupos[key].tarefas.push(t);
+  });
+
+  const board = document.getElementById('tlBoard');
+  if (!board) return;
+
+  if (!Object.keys(grupos).length) {
+    board.innerHTML = '<div class="tl-empty">Nenhuma tarefa encontrada para os filtros selecionados.</div>';
+    return;
+  }
+
+  // Posição hoje
+  const hojePos = Math.min(100, Math.max(0, Math.round((hoje - minD) / 86400000 / totalDias * 100)));
+
+  let html = '';
+  Object.values(grupos).forEach(grupo => {
+    const concl = grupo.tarefas.filter(t => getStatus(t) === 'concluido').length;
+    const progP = grupo.tarefas.length ? Math.round(concl / grupo.tarefas.length * 100) : 0;
+    const cor = grupo.projeto?.cor || '#4F46E5';
+
+    html += `<div class="tl-proj-group">
+      <div class="tl-proj-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <div class="tl-proj-dot" style="background:${cor}"></div>
+        <div class="tl-proj-name">${grupo.nome}</div>
+        <div class="tl-proj-prog">${progP}% concluído · ${grupo.tarefas.length} tarefas</div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div>`;
+
+    grupo.tarefas.forEach(t => {
+      const st = getStatus(t);
+      const cls = statusClass[st];
+      const lbl = statusLabel[st];
+      const resp = memb.find(m => m.av === t.resp);
+      const respNome = resp?.nome?.split(' ')[0] || t.resp || '—';
+
+      // Calcular posição da barra
+      const tIni = t.data_inicio ? new Date(t.data_inicio) : new Date(hoje);
+      const tFim = t.prazo ? new Date(t.prazo) : new Date(hoje.getTime() + 7*86400000);
+      const left = Math.min(99, Math.max(0, Math.round((tIni - minD) / 86400000 / totalDias * 100)));
+      const width = Math.min(100 - left, Math.max(3, Math.round((tFim - tIni) / 86400000 / totalDias * 100)));
+      const prog = t.prog || 0;
+
+      html += `<div class="tl-task-row" onclick="openDet('${t.id}')"
+        draggable="true"
+        ondragstart="tlDragStart(event,'${t.id}')"
+        ondragend="tlDragEnd(event,'${t.id}')">
+        <div class="tl-task-label">
+          <div class="tl-task-name" title="${t.titulo}">${t.titulo}</div>
+          <div class="tl-task-meta">${respNome} · <span style="color:${st==='atrasado'?'#EF4444':st==='concluido'?'#10B981':st==='andamento'?'#F59E0B':'#3B82F6'}">${lbl}</span></div>
+        </div>
+        <div class="tl-task-bar-wrap">
+          <div class="tl-grid-line" style="left:${hojePos}%"></div>
+          <div class="tl-today" style="left:${hojePos}%"></div>
+          <div class="tl-bar ${cls}" style="left:${left}%;width:${width}%"
+            title="${t.titulo} · ${prog}% · ${lbl}"
+            ondragover="tlDragOver(event)"
+            ondrop="tlDrop(event,'${t.id}')">
+            <div class="tl-bar-fill" style="width:${prog}%"></div>
+            <span class="tl-bar-txt">${t.titulo.length > 15 ? t.titulo.substring(0,14)+'…' : t.titulo} ${prog?prog+'%':''}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  board.innerHTML = html;
 }
 
-// ══ PAINEL ESTRATÉGICO ══════════════════════════════════════════
+// Drag and drop na timeline
+let tlDragId = null;
+let tlDragX0 = 0;
+
+function tlDragStart(e, id) {
+  tlDragId = id;
+  tlDragX0 = e.clientX;
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function tlDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+
+function tlDragEnd(e, id) {
+  const dx = e.clientX - tlDragX0;
+  const wrap = e.target.closest('.tl-task-bar-wrap');
+  if (!wrap) return;
+  const totalPx = wrap.offsetWidth;
+  const fPer = document.getElementById('tlFiltroPer')?.value || 'tri';
+  const periodos = { mes:1, tri:3, sem:6, ano:12 };
+  const totalDias = periodos[fPer] * 30;
+  const diasShift = Math.round(dx / totalPx * totalDias);
+  if (diasShift === 0) return;
+  const t = tar.find(x => x.id === id);
+  if (!t) return;
+  if (t.data_inicio) {
+    const d = new Date(t.data_inicio);
+    d.setDate(d.getDate() + diasShift);
+    t.data_inicio = d.toISOString().split('T')[0];
+  }
+  if (t.prazo) {
+    const d = new Date(t.prazo);
+    d.setDate(d.getDate() + diasShift);
+    t.prazo = d.toISOString().split('T')[0];
+  }
+  salvarLocal();
+  renderTimeline();
+  showToast('📅 Datas atualizadas!');
+}
+
+function tlDrop(e, id) { e.preventDefault(); }
+
+
 function renderPainel() {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const projAtivos = proj.filter(p => p.status !== 'concluido');
