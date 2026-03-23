@@ -3766,7 +3766,7 @@ function setView(v,b) { curView=v; document.querySelectorAll('#viewChips .chip')
 async function addTask() {
   const t = document.getElementById('ntT').value.trim();
   if (!t) { showToast('Digite o título'); return; }
-  const nova = { tit:t, descricao:'', projeto_id:document.getElementById('ntPj').value||null, resp:document.getElementById('ntR').value||curUser?.av, prior:document.getElementById('ntPr').value, prazo:document.getElementById('ntD').value||null, status:document.getElementById('ntSt').value||'to do', ok:false };
+  const nova = { titulo:t, descricao:'', projeto_id:document.getElementById('ntPj').value||null, resp:document.getElementById('ntR').value||curUser?.av, prior:document.getElementById('ntPr').value, prazo:document.getElementById('ntD').value||null, status:document.getElementById('ntSt').value||'to do', ok:false };
   const { data, error } = await safeDb.from('tarefas').insert([nova]).select().single();
   if (error) { showToast('❌ Erro: ' + error.message); return; }
   tar.unshift(data);
@@ -3820,7 +3820,7 @@ function openEditTask(id) {
 }
 
 async function saveEditTask(id) {
-  const upd = { tit:document.getElementById('ntT').value.trim(), projeto_id:document.getElementById('ntPj').value||null, resp:document.getElementById('ntR').value||null, prior:document.getElementById('ntPr').value, prazo:document.getElementById('ntD').value||null, status:document.getElementById('ntSt').value, updated_at: new Date().toISOString() };
+  const upd = { titulo:document.getElementById('ntT').value.trim(), projeto_id:document.getElementById('ntPj').value||null, resp:document.getElementById('ntR').value||null, prior:document.getElementById('ntPr').value, prazo:document.getElementById('ntD').value||null, status:document.getElementById('ntSt').value, updated_at: new Date().toISOString() };
   const { error } = await safeDb.from('tarefas').update(upd).eq('id', id);
   if (error) { showToast('❌ Erro: ' + error.message); return; }
   const idx = tar.findIndex(t => t.id===id);
@@ -5459,7 +5459,7 @@ async function addMeet() {
   const todos = [curUser?.av||'MA', ...conviteParticipantes].filter((v,i,a) => a.indexOf(v)===i);
 
   const nova = {
-    tit: t,
+    titulo: t,
     dia: ps[2],
     mes: ms[parseInt(ps[1])-1],
     hora: document.getElementById('nmH').value||'09:00',
