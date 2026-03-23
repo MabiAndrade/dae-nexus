@@ -3081,9 +3081,15 @@ function sw(name, el) {
   }
   const ttEl = document.getElementById('topbar-page-title');
   if (ttEl) ttEl.textContent = titles[name] || '';
-  if (name === 'proj') setTimeout(renderHierarquia, 50);
-  if (name === 'gantt') setTimeout(renderGantt, 50);
-  if (name === 'painel') setTimeout(renderPainel, 50);
+  if (name === 'home')   { renderDashInteligente(); renderUrgent(); renderAct(); renderFeriasMini(); }
+  if (name === 'tasks')  { setTimeout(renderTasks, 50); }
+  if (name === 'proj')   { setTimeout(renderHierarquia, 50); }
+  if (name === 'meet')   { setTimeout(renderMeet, 50); }
+  if (name === 'team')   { setTimeout(renderMembers, 50); }
+  if (name === 'risk')   { setTimeout(renderRiscos, 50); }
+  if (name === 'gantt')  { setTimeout(renderGantt, 50); }
+  if (name === 'painel') { setTimeout(renderPainel, 50); }
+  if (name === 'meuespaco') { setTimeout(meRenderAtual, 50); }
   if (name === 'config') { renderCadastros(); updateSelects(); }
 }
 
@@ -6555,7 +6561,7 @@ function renderTimeline() {
       const width = Math.min(100 - left, Math.max(3, Math.round((tFim - tIni) / 86400000 / totalDias * 100)));
       const prog = t.prog || 0;
 
-      html += `<div class="tl-task-row" onclick="openDet('${t.id}')"
+      html += `<div class="tl-task-row" onclick="openDet('task','${t.id}')"
         draggable="true"
         ondragstart="tlDragStart(event,'${t.id}')"
         ondragend="tlDragEnd(event,'${t.id}')">
