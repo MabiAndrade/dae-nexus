@@ -3307,15 +3307,26 @@ async function loadAll() {
         safeDb.from('espacos').select('*').order('nome'),
       ]);
       // Só usar dados do Supabase se retornar algo (evita sobrescrever local com vazio)
-      if (pm.data  && pm.data.length)  { proj    = pm.data;  }
-      if (tm.data  && tm.data.length)  { tar     = tm.data;  }
-      if (mm.data  && mm.data.length)  { memb    = mm.data;  }
-      if (fm.data  && fm.data.length)  { ferias  = fm.data;  }
-      if (rm.data  && rm.data.length)  { riscos  = rm.data;  }
-      if (rem.data && rem.data.length) { reun    = rem.data; }
-      if (am.data  && am.data.length)  { agenda  = am.data;  }
-      if (avm.data && avm.data.length) { ativs   = avm.data; }
-      if (espm.data && espm.data.length){ espacos = espm.data;}
+      // Normalizar colunas (Supabase pode traduzir nomes)
+      const norm = (arr) => arr ? arr.map(r => {
+        if (r['eu ia'] && !r.id) r.id = r['eu ia'];
+        if (r['peito'] && !r.tit) r.tit = r['peito'];
+        if (r['descrição'] && !r.descricao) r.descricao = r['descrição'];
+        if (r['anterior'] && !r.prior) r.prior = r['anterior'];
+        if (r['departamento'] && !r.dept) r.dept = r['departamento'];
+        if (r['carga'] && !r.cargo) r.cargo = r['carga'];
+        return r;
+      }) : [];
+
+      if (mm.data  && mm.data.length)  { memb    = norm(mm.data);  }
+      if (pm.data  && pm.data.length)  { proj    = norm(pm.data);  }
+      if (tm.data  && tm.data.length)  { tar     = norm(tm.data);  }
+      if (fm.data  && fm.data.length)  { ferias  = norm(fm.data);  }
+      if (rm.data  && rm.data.length)  { riscos  = norm(rm.data);  }
+      if (rem.data && rem.data.length) { reun    = norm(rem.data); }
+      if (am.data  && am.data.length)  { agenda  = norm(am.data);  }
+      if (avm.data && avm.data.length) { ativs   = norm(avm.data); }
+      if (espm.data && espm.data.length){ espacos = norm(espm.data);}
       // Sincronizar localStorage com dados do Supabase
       salvarLocal();
     } catch(e) {
@@ -6418,7 +6429,7 @@ function renderGantt() {
   if (!lista.length) { el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--tx3)">Nenhum projeto com prazo definido</div>'; return; }
 
   // Calcular range de datas
-  const datas = lista.flatMap(p => [new Date(p.created_at||hoje), new Date(p.fim)]);
+  const datas = lista.flatMap(p => [new Date(p.inicio||p.created_at||hoje), new Date(p.fim)]);
   const minD = new Date(Math.min(...datas.map(d=>d.getTime())));
   const maxD = new Date(Math.max(...datas.map(d=>d.getTime())));
   minD.setDate(1);
@@ -6444,7 +6455,7 @@ function renderGantt() {
   `;
 
   lista.forEach((p,i) => {
-    const inicio = new Date(p.created_at || minD);
+    const inicio = new Date(p.inicio || p.created_at || minD);
     const fim = new Date(p.fim);
     const left = Math.max(0, Math.round((inicio-minD)/86400000/totalDias*100));
     const width = Math.max(2, Math.round((fim-inicio)/86400000/totalDias*100));
