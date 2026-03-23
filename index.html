@@ -3400,7 +3400,7 @@ function renderDashInteligente() {
   el('statAtrasados', projAtrasados.length);
   el('statAtrasadosNomes', projAtrasados.length ? projAtrasados.slice(0,2).map(p=>p.nome.split(' ')[0]).join(', ') : 'Nenhum');
   el('statUrgentes', tarUrgentes.length);
-  el('statUrgentesNomes', tarUrgentes.length ? tarUrgentes.slice(0,2).map(t=>t.titulo||t.tit||'').join(', ') : 'Tudo ok');
+  el('statUrgentesNomes', tarUrgentes.length ? tarUrgentes.slice(0,2).map(t=>t.titulo||(t.titulo||t.tit)||'').join(', ') : 'Tudo ok');
   el('statRiscos', riscosAtivos.length);
   el('statRiscosStr', riscosAltos.length ? riscosAltos.length + ' de alta severidade' : 'Sem riscos altos');
 
@@ -3422,7 +3422,7 @@ function renderDashInteligente() {
     alertas.push({ tipo:'red', svg:SVG_ALERTA_RED, titulo:`Risco ALTO: ${(r.descricao||r.desc||'').slice(0,50)}`, sub:`Projeto: ${proj.find(p=>p.id===r.projeto_id)?.nome||'—'} · Responsável: ${memb.find(m=>m.av===r.resp)?.nome||r.resp||'—'}` });
   });
   if (tarUrgentes.length) {
-    alertas.push({ tipo:'yellow', svg:SVG_ALERTA_FIRE, titulo:`${tarUrgentes.length} tarefa${tarUrgentes.length>1?'s':''} urgente${tarUrgentes.length>1?'s':''}`, sub:tarUrgentes.slice(0,3).map(t=>t.titulo||t.tit||'').join(' · ') });
+    alertas.push({ tipo:'yellow', svg:SVG_ALERTA_FIRE, titulo:`${tarUrgentes.length} tarefa${tarUrgentes.length>1?'s':''} urgente${tarUrgentes.length>1?'s':''}`, sub:tarUrgentes.slice(0,3).map(t=>t.titulo||(t.titulo||t.tit)||'').join(' · ') });
   }
   const adEl = document.getElementById('alertasDash');
   if (adEl) {
@@ -3766,7 +3766,7 @@ function setView(v,b) { curView=v; document.querySelectorAll('#viewChips .chip')
 async function addTask() {
   const t = document.getElementById('ntT').value.trim();
   if (!t) { showToast('Digite o título'); return; }
-  const nova = { titulo:t, descricao:'', projeto_id:document.getElementById('ntPj').value||null, resp:document.getElementById('ntR').value||curUser?.av, prior:document.getElementById('ntPr').value, prazo:document.getElementById('ntD').value||null, status:document.getElementById('ntSt').value||'to do', ok:false };
+  const nova = { titulo:t, tit:t, descricao:'', projeto_id:document.getElementById('ntPj').value||null, resp:document.getElementById('ntR').value||curUser?.av, prior:document.getElementById('ntPr').value, prazo:document.getElementById('ntD').value||null, status:document.getElementById('ntSt').value||'to do', ok:false };
   const { data, error } = await safeDb.from('tarefas').insert([nova]).select().single();
   if (error) { showToast('❌ Erro: ' + error.message); return; }
   tar.unshift(data);
@@ -3807,7 +3807,7 @@ async function delTask(id) {
 function openEditTask(id) {
   const t = tar.find(x => x.id===id);
   if (!t) return;
-  document.getElementById('ntT').value = t.tit;
+  document.getElementById('ntT').value = t.titulo || t.tit || '';
   document.getElementById('ntPj').value = t.projeto_id||'';
   document.getElementById('ntR').value = t.resp||'';
   document.getElementById('ntPr').value = t.prior||'media';
@@ -3820,7 +3820,7 @@ function openEditTask(id) {
 }
 
 async function saveEditTask(id) {
-  const upd = { titulo:document.getElementById('ntT').value.trim(), projeto_id:document.getElementById('ntPj').value||null, resp:document.getElementById('ntR').value||null, prior:document.getElementById('ntPr').value, prazo:document.getElementById('ntD').value||null, status:document.getElementById('ntSt').value, updated_at: new Date().toISOString() };
+  const upd = { tit:document.getElementById('ntT').value.trim(), projeto_id:document.getElementById('ntPj').value||null, resp:document.getElementById('ntR').value||null, prior:document.getElementById('ntPr').value, prazo:document.getElementById('ntD').value||null, status:document.getElementById('ntSt').value, updated_at: new Date().toISOString() };
   const { error } = await safeDb.from('tarefas').update(upd).eq('id', id);
   if (error) { showToast('❌ Erro: ' + error.message); return; }
   const idx = tar.findIndex(t => t.id===id);
@@ -5459,7 +5459,7 @@ async function addMeet() {
   const todos = [curUser?.av||'MA', ...conviteParticipantes].filter((v,i,a) => a.indexOf(v)===i);
 
   const nova = {
-    titulo: t,
+    tit: t,
     dia: ps[2],
     mes: ms[parseInt(ps[1])-1],
     hora: document.getElementById('nmH').value||'09:00',
@@ -5770,7 +5770,7 @@ function renderRiscos() {
       const dias = Math.floor((hoje - new Date(t.prazo)) / 86400000);
       return `<div class="urgent-item" onclick="openDet('task','${t.id}')">
         <div class="urgent-dot"></div>
-        <div class="urgent-txt">${t.tit}</div>
+        <div class="urgent-txt">${t.titulo||t.tit||"Sem título"}</div>
         <div style="font-size:10px;color:#EF4444;font-weight:700;white-space:nowrap">${dias}d atraso</div>
         <div style="font-size:10px;color:var(--tx3);white-space:nowrap">${m?.nome?.split(' ')[0]||t.resp}</div>
       </div>`;
@@ -5820,7 +5820,7 @@ function renderRiscos() {
       const cor = dias<=1?'#EF4444':dias<=3?'#F59E0B':'#10B981';
       return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
         <div style="min-width:55px;font-size:10px;font-weight:700;color:${cor};text-align:center;background:${cor}15;padding:3px 6px;border-radius:4px">${label}</div>
-        <div style="flex:1;font-size:12px;font-weight:600;color:var(--tx)">${t.tit}</div>
+        <div style="flex:1;font-size:12px;font-weight:600;color:var(--tx)">${t.titulo||t.tit||"Sem título"}</div>
         <div style="font-size:10px;color:var(--tx3)">${m?.nome?.split(' ')[0]||t.resp}</div>
       </div>`;
     }).join('') : '<div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Nenhuma entrega nos próximos 7 dias</div>';
@@ -6837,7 +6837,7 @@ function gsearch(q) {
   if (!q || q.length < 2) { drop.classList.remove('on'); return; }
   const ql = q.toLowerCase();
   const rProj = proj.filter(p => p.nome.toLowerCase().includes(ql) || (p.dept||'').toLowerCase().includes(ql)).slice(0,4);
-  const rTask = tar.filter(t => (t.titulo||t.tit||'').toLowerCase().includes(ql)).slice(0,4);
+  const rTask = tar.filter(t => (t.titulo||(t.titulo||t.tit)||'').toLowerCase().includes(ql)).slice(0,4);
   const rMemb = memb.filter(m => m.nome.toLowerCase().includes(ql) || m.av.toLowerCase().includes(ql)).slice(0,3);
 
   if (!rProj.length && !rTask.length && !rMemb.length) {
