@@ -3689,9 +3689,10 @@ function trow(t) {
         <span>·</span><span class="badge" style="background:var(--s3);color:var(--tx3);font-size:8px;padding:1px 5px">${t.status}</span>
       </div>
     </div>
-    <div style="display:flex;gap:4px;align-items:center">
+    <div style="display:flex;gap:6px;align-items:center">
+      <div style="width:26px;height:26px;border-radius:7px;background:${m?.cor||'#4F46E5'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0">${m?.av||t.resp||'?'}</div>
       <div class="tpr" style="background:${pc}"></div>
-      <button onclick="event.stopPropagation();openEditTask('${t.id}')" style="background:var(--s3);border:none;border-radius:5px;padding:4px 6px;font-size:10px;color:var(--tx2);cursor:pointer">✏️</button>
+      <button onclick="event.stopPropagation();openEditTask('${t.id}')" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:4px 6px;font-size:10px;color:var(--tx2);cursor:pointer">✏️</button>
       <button onclick="event.stopPropagation();delTask('${t.id}')" style="background:rgba(239,68,68,.1);border:none;border-radius:5px;padding:4px 6px;font-size:10px;color:#EF4444;cursor:pointer">🗑</button>
     </div>
   </div>`;
@@ -4022,42 +4023,56 @@ function iniciarTimer(tarefaId) {
   timerInicio = Date.now();
   const t = tar.find(x => x.id === tarefaId);
   const base = t?.tempo_gasto || 0;
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  iniciarTimerUI(tarefaId, base);
-  showToast('▶ Timer iniciado! Cronômetro rodando...');
-}
-
-function iniciarTimerUI(tarefaId, base) {
   if (timerInterval) clearInterval(timerInterval);
-  const startRef = timerInicio || Date.now();
-  timerInicio = startRef;
+  // Atualizar display a cada segundo
   timerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - startRef) / 1000);
-    const total = base + elapsed;
+    const elapsed = Math.floor((Date.now() - timerInicio) / 1000);
     const el = document.getElementById('tempoDisplay');
-    if (el) el.textContent = fmtTempo(total);
-  }, 500);
+    if (el) el.textContent = fmtTempo(base + elapsed);
+  }, 1000);
+  // Atualizar botão
   const btn = document.getElementById('btnTimer');
-  if (btn) { btn.textContent = '⏹ PARAR'; btn.style.background='rgba(239,68,68,0.2)'; btn.style.borderColor='#EF4444'; btn.style.color='#EF4444'; }
+  if (btn) {
+    btn.textContent = '⏹ PARAR';
+    btn.style.background = 'rgba(239,68,68,0.2)';
+    btn.style.borderColor = '#EF4444';
+    btn.style.color = '#EF4444';
+  }
+  showToast('▶ Timer iniciado!');
 }
 
 async function pararTimer(tarefaId) {
-  if (!timerInicio) { showToast('Timer não iniciado'); return; }
-  clearInterval(timerInterval); timerInterval = null;
+  if (!timerInicio) return;
+  clearInterval(timerInterval);
+  timerInterval = null;
   const elapsed = Math.floor((Date.now() - timerInicio) / 1000);
   const t = tar.find(x => x.id === tarefaId);
   const base = t?.tempo_gasto || 0;
   const total = base + elapsed;
-  const { error } = await safeDb.from('tarefas').update({ tempo_gasto: total, updated_at: new Date().toISOString() }).eq('id', tarefaId);
-  if (error) { showToast('❌ Erro ao salvar tempo: ' + error.message); return; }
+  // Salvar no Supabase se ID real
+  if (!String(tarefaId).startsWith('local_')) {
+    await safeDb.from('tarefas').update({ tempo_gasto: total }).eq('id', tarefaId);
+  }
   if (t) t.tempo_gasto = total;
-  timerTarefaId = null; timerInicio = null;
+  salvarLocal();
+  timerTarefaId = null;
+  timerInicio = null;
+  // Atualizar display
   const el = document.getElementById('tempoDisplay');
   if (el) el.textContent = fmtTempo(total);
+  // Atualizar botão
   const btn = document.getElementById('btnTimer');
-  if (btn) { btn.textContent = '▶ INICIAR'; btn.style.background='rgba(34,197,94,0.2)'; btn.style.borderColor='#22C55E'; btn.style.color='#22C55E'; }
-  showToast(`⏱ Tempo total: ${fmtTempo(total)}`);
+  if (btn) {
+    btn.textContent = '▶ INICIAR';
+    btn.style.background = 'rgba(34,197,94,0.2)';
+    btn.style.borderColor = '#22C55E';
+    btn.style.color = '#22C55E';
+  }
+  showToast('⏱ Tempo registrado: ' + fmtTempo(total));
 }
+
+
+
 
 async function salvarStatus(tarefaId, status) {
   const ok = status === 'feito';
