@@ -2657,8 +2657,11 @@ select.sel{
   <div class="tl-filters">
     <div class="tl-search">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input id="tlBusca" placeholder="Buscar tarefa ou projeto..." oninput="renderTimeline()">
+      <input id="tlBusca" placeholder="Buscar tarefa..." oninput="renderTimeline()">
     </div>
+    <select class="tl-sel" id="tlFiltroProj" onchange="renderTimeline()">
+      <option value="">Todos os projetos</option>
+    </select>
     <select class="tl-sel" id="tlFiltroStatus" onchange="renderTimeline()">
       <option value="">Todos os status</option>
       <option value="atrasado">Atrasado</option>
@@ -3065,32 +3068,27 @@ function sw(name, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
   const tabEl = document.getElementById('t-' + name);
-  if (!tabEl) { console.warn('Tab não encontrada: t-' + name); return; }
+  if (!tabEl) return;
   tabEl.classList.add('on');
   if (el) el.classList.add('on');
-  // Atualizar título da topbar
   const titles = {home:'Dashboard',proj:'Estações & Espaços',tasks:'Tarefas',chat:'Chat',meet:'Agenda',risk:'Radar da Operação',gantt:'Timeline',painel:'Painel Estratégico',nova:'Nova IA',team:'Equipe',config:'Cadastros'};
-  // Reset chat state ao navegar
-  if (name === 'chat') {
-    const cw = document.getElementById('chatWin');
-    const ce = document.getElementById('chatEmpty');
-    if (!curChId) {
-      if (cw) cw.style.display = 'none';
-      if (ce) ce.style.display = 'flex';
-    }
-  }
   const ttEl = document.getElementById('topbar-page-title');
   if (ttEl) ttEl.textContent = titles[name] || '';
-  if (name === 'home')   { renderDashInteligente(); renderUrgent(); renderAct(); renderFeriasMini(); }
-  if (name === 'tasks')  { setTimeout(renderTasks, 50); }
-  if (name === 'proj')   { setTimeout(renderHierarquia, 50); }
-  if (name === 'meet')   { setTimeout(renderMeet, 50); }
-  if (name === 'team')   { setTimeout(renderMembers, 50); }
-  if (name === 'risk')   { setTimeout(renderRiscos, 50); }
-  if (name === 'gantt')  { setTimeout(renderGantt, 50); }
-  if (name === 'painel') { setTimeout(renderPainel, 50); }
-  if (name === 'meuespaco') { setTimeout(meRenderAtual, 50); }
-  if (name === 'config') { renderCadastros(); updateSelects(); }
+  // Renderizar aba ativa
+  const renders = {
+    home:    () => { try{renderDashInteligente();}catch(e){} try{renderUrgent();}catch(e){} try{renderAct();}catch(e){} try{renderFeriasMini();}catch(e){} },
+    tasks:   () => { try{renderTasks();}catch(e){console.error('renderTasks',e)} },
+    proj:    () => { try{renderHierarquia();}catch(e){} },
+    meet:    () => { try{renderMeet();}catch(e){} },
+    team:    () => { try{renderMembers();}catch(e){} },
+    risk:    () => { try{renderRiscos();}catch(e){} },
+    gantt:   () => { try{renderGantt();}catch(e){} },
+    painel:  () => { try{renderPainel();}catch(e){} },
+    meuespaco: () => { try{meRenderAtual();}catch(e){} },
+    config:  () => { try{renderCadastros();}catch(e){} try{updateSelects();}catch(e){} },
+    chat:    () => { const cw=document.getElementById('chatWin'); const ce=document.getElementById('chatEmpty'); if(!curChId){if(cw)cw.style.display='none';if(ce)ce.style.display='flex';} }
+  };
+  setTimeout(() => { if (renders[name]) renders[name](); }, 30);
 }
 
 // ── CHART DASHBOARD ───────────────────────────────────────────────
@@ -3236,6 +3234,7 @@ const safeDb = db ? db : makeSafeDb();
 
 // ── ESTADO LOCAL (cache em memória) ───────────────────────────────
 let proj = [], tar = [], memb = [], ferias = [], riscos = [], reun = [], agenda = [], ativs = [], notifs = [], espacos = [];
+let timerTarefaId = null, timerInicio = null, timerInterval = null;
 
 // ── LOGIN ─────────────────────────────────────────────────────────
 async function doLogin() {
@@ -3329,6 +3328,11 @@ async function loadAll() {
         return r;
       }) : [];
 
+      console.log('DEBUG membros:', mm.data?.length, mm.data?.[0]);
+      console.log('DEBUG projetos:', pm.data?.length, pm.data?.[0]);
+      console.log('DEBUG tarefas:', tm.data?.length, tm.data?.[0]);
+      console.log('DEBUG erro membros:', mm.error);
+      console.log('DEBUG erro projetos:', pm.error);
       if (mm.data  && mm.data.length)  { memb    = norm(mm.data);  }
       if (pm.data  && pm.data.length)  { proj    = norm(pm.data);  }
       if (tm.data  && tm.data.length)  { tar     = norm(tm.data);  }
@@ -3700,7 +3704,7 @@ function renderTasks() {
   let l = [...tar];
   if (curTF==='minhas') l = l.filter(t => t.resp===curUser?.av);
   if (curTF==='urgente') l = l.filter(t => t.prior==='urgente' && !t.ok);
-  if (curTF==='andamento') l = l.filter(t => !t.ok && (t.status.includes('andamento')||t.status.includes('desenvolv')));
+  if (curTF==='andamento') l = l.filter(t => !t.ok && ((t.status||'').includes('andamento')||(t.status||'').includes('desenvolv')));
   if (curTF==='concluidas') l = l.filter(t => t.ok);
   if (curView==='kanban') { renderKanban(l); return; }
   const ab = l.filter(t => !t.ok), dn = l.filter(t => t.ok);
@@ -6435,6 +6439,7 @@ function renderTimeline() {
   const fStatus = document.getElementById('tlFiltroStatus')?.value || '';
   const fResp   = document.getElementById('tlFiltroResp')?.value   || '';
   const fPer    = document.getElementById('tlFiltroPer')?.value    || 'tri';
+  const fProj   = document.getElementById('tlFiltroProj')?.value   || '';
 
   // Popular select de responsáveis
   const selResp = document.getElementById('tlFiltroResp');
@@ -6443,6 +6448,16 @@ function renderTimeline() {
       const o = document.createElement('option');
       o.value = m.av; o.textContent = m.nome?.split(' ')[0] || m.av;
       selResp.appendChild(o);
+    });
+  }
+
+  // Popular select de projetos
+  const selProj = document.getElementById('tlFiltroProj');
+  if (selProj && selProj.options.length <= 1) {
+    proj.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.id; o.textContent = p.nome;
+      selProj.appendChild(o);
     });
   }
 
@@ -6466,7 +6481,8 @@ function renderTimeline() {
   let tarefasFiltradas = tar.filter(t => {
     if (fStatus && getStatus(t) !== fStatus) return false;
     if (fResp && t.resp !== fResp) return false;
-    if (busca && !t.titulo?.toLowerCase().includes(busca)) return false;
+    if (fProj && t.projeto_id !== fProj) return false;
+    if (busca && !(t.titulo||t.tit||'').toLowerCase().includes(busca)) return false;
     return true;
   });
 
@@ -6572,12 +6588,12 @@ function renderTimeline() {
         <div class="tl-task-bar-wrap">
           <div class="tl-grid-line" style="left:${hojePos}%"></div>
           <div class="tl-today" style="left:${hojePos}%"></div>
-          <div class="tl-bar ${cls}" style="left:${left}%;width:${width}%"
-            title="${t.titulo} · ${prog}% · ${lbl}"
+          <div class="tl-bar ${cls}" style="left:${Math.max(0,left)}%;width:${Math.max(8,width)}%;min-width:80px"
+            title="${(t.titulo||t.tit||'')} · ${prog}% · ${lbl}"
             ondragover="tlDragOver(event)"
             ondrop="tlDrop(event,'${t.id}')">
             <div class="tl-bar-fill" style="width:${prog}%"></div>
-            <span class="tl-bar-txt">${t.titulo.length > 15 ? t.titulo.substring(0,14)+'…' : t.titulo} ${prog?prog+'%':''}</span>
+            <span class="tl-bar-txt">${(t.titulo||t.tit||'').length > 18 ? (t.titulo||t.tit||'').substring(0,17)+'…' : (t.titulo||t.tit||'')} ${prog?prog+'%':''}</span>
           </div>
         </div>
       </div>`;
