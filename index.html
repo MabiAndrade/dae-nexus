@@ -3235,6 +3235,8 @@ const safeDb = db ? db : makeSafeDb();
 // ── ESTADO LOCAL (cache em memória) ───────────────────────────────
 let proj = [], tar = [], memb = [], ferias = [], riscos = [], reun = [], agenda = [], ativs = [], notifs = [], espacos = [];
 let timerTarefaId = null, timerInicio = null, timerInterval = null;
+let curPF = 'todos', curTF = 'todas', curView = 'lista', curChId = null;
+let curChName = '', curTeamView = 'cards', curUser = null;
 
 // ── LOGIN ─────────────────────────────────────────────────────────
 async function doLogin() {
@@ -3328,11 +3330,6 @@ async function loadAll() {
         return r;
       }) : [];
 
-      console.log('DEBUG membros:', mm.data?.length, mm.data?.[0]);
-      console.log('DEBUG projetos:', pm.data?.length, pm.data?.[0]);
-      console.log('DEBUG tarefas:', tm.data?.length, tm.data?.[0]);
-      console.log('DEBUG erro membros:', mm.error);
-      console.log('DEBUG erro projetos:', pm.error);
       if (mm.data  && mm.data.length)  { memb    = norm(mm.data);  }
       if (pm.data  && pm.data.length)  { proj    = norm(pm.data);  }
       if (tm.data  && tm.data.length)  { tar     = norm(tm.data);  }
@@ -5589,16 +5586,26 @@ async function addMember() {
 
   if (id) {
     // Editar membro existente — NÃO altera o 'av' pois é chave estrangeira nas tarefas
-    const { error } = await safeDb.from('membros').update({
-      nome: dados.nome,
-      cargo: dados.cargo,
-      dept: dados.dept,
-      email: dados.email,
-      whatsapp: dados.whatsapp
-    }).eq('id', id);
-    if (error) { showToast('❌ Erro: ' + error.message); return; }
-    const idx = memb.findIndex(m => m.id == id);
-    if (idx >= 0) memb[idx] = { ...memb[idx], ...dados };
+    const isLocal = String(id).startsWith('local_');
+    if (isLocal) {
+      // ID local — fazer INSERT real no Supabase
+      const novo = { ...dados, cor: CL[memb.length%CL.length] };
+      const { data: inserted, error } = await safeDb.from('membros').insert([novo]).select().single();
+      const idx = memb.findIndex(m => m.id == id);
+      if (inserted && idx >= 0) memb[idx] = inserted;
+      else if (idx >= 0) memb[idx] = { ...memb[idx], ...dados };
+    } else {
+      const { error } = await safeDb.from('membros').update({
+        nome: dados.nome,
+        cargo: dados.cargo,
+        dept: dados.dept,
+        email: dados.email,
+        whatsapp: dados.whatsapp
+      }).eq('id', id);
+      if (error) { showToast('❌ Erro: ' + error.message); return; }
+      const idx = memb.findIndex(m => m.id == id);
+      if (idx >= 0) memb[idx] = { ...memb[idx], ...dados };
+    }
     salvarLocal();
     showToast('✅ Membro atualizado!');
   } else {
