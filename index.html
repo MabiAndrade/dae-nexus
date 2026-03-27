@@ -787,11 +787,12 @@ button{font-family:var(--fb);}
 }
 .detpanel.on{display:flex;}
 .detbox{
-  background:var(--surface);
+  background:#FFFFFF;
   border-radius:22px 22px 0 0;padding:22px;width:100%;
   box-shadow:0 -8px 40px rgba(0,0,0,0.15);
   max-height:88dvh;overflow-y:auto;
   animation:slideUp .3s var(--ease) both;
+  color:#1E2A3B;
 }
 .deth{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
 .detclose{
@@ -1144,7 +1145,7 @@ select,input[type="checkbox"]{accent-color:var(--brand);}
   .ov .modal{border-radius:20px;margin:auto;}
   .ov{align-items:center;}
   .detpanel{align-items:stretch;justify-content:flex-end;}
-  .detbox{border-radius:0;max-width:500px;height:100%;max-height:100vh;border:none;border-left:1px solid var(--border);}
+  .detbox{border-radius:0;max-width:520px;height:100%;max-height:100vh;border:none;border-left:1px solid var(--border);background:#FFFFFF;color:#1E2A3B;}
   .nmsgs{max-height:500px;}
   .kcol{min-width:240px;}
   .nova-wrap{height:calc(100dvh - var(--topbar-h) - 56px);}
@@ -2922,32 +2923,32 @@ select.sel{
 
   <!-- STEP 3: Participantes -->
   <div style="font-size:10px;font-weight:700;color:var(--gold2);letter-spacing:1px;margin:12px 0 8px">③ PARTICIPANTES</div>
-  <div id="nmParticipantesList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:38px;background:var(--s2);border:1px solid var(--br);border-radius:var(--rs);padding:8px;"></div>
+  <div id="nmParticipantesList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:38px;background:var(--surface2);border:1px solid var(--br);border-radius:var(--rs);padding:8px;"></div>
   <div style="position:relative;margin-bottom:4px">
     <input class="inp" style="margin:0" placeholder="🔍 Buscar membro para adicionar..." id="nmBuscaMembro" oninput="buscarMembroConvite(this.value)">
-    <div id="nmMembrosDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--s1);border:1px solid var(--br2);border-radius:10px;z-index:50;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)"></div>
+    <div id="nmMembrosDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--br2);border-radius:10px;z-index:50;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)"></div>
   </div>
   <button style="background:none;border:none;color:var(--gold2);font-size:11px;cursor:pointer;margin-bottom:14px;padding:2px 0" onclick="adicionarTodosPartic()">+ Adicionar toda a equipe de uma vez</button>
 
   <!-- STEP 4: Canais -->
   <div style="font-size:10px;font-weight:700;color:var(--gold2);letter-spacing:1px;margin-bottom:8px">④ DISPARAR CONVITE VIA</div>
   <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:7px 12px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--br)'">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--surface2);border:1px solid var(--br);border-radius:8px;padding:7px 12px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--br)'">
       <input type="checkbox" id="chkNotif" checked style="accent-color:var(--gold)"> 🔔 Notif. interna
     </label>
-    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:7px 12px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--br)'">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--surface2);border:1px solid var(--br);border-radius:8px;padding:7px 12px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--br)'">
       <input type="checkbox" id="chkEmail" checked style="accent-color:var(--gold)"> 📧 E-mail
     </label>
-    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:7px 12px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--br)'">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--surface2);border:1px solid var(--br);border-radius:8px;padding:7px 12px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--br)'">
       <input type="checkbox" id="chkWhats" checked style="accent-color:var(--gold)"> 💬 WhatsApp
     </label>
   </div>
 
   <!-- Preview convite -->
-  <div id="nmConvitePreview" style="display:none;background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:12px;margin-bottom:12px;font-size:11px;color:var(--tx2);line-height:1.7"></div>
+  <div id="nmConvitePreview" style="display:none;background:var(--surface2);border:1px solid var(--br);border-radius:10px;padding:12px;margin-bottom:12px;font-size:11px;color:var(--tx2);line-height:1.7"></div>
 
   <!-- COBERTURA DE DISPARO -->
-  <div id="nmCobertura" style="display:none;background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:12px;margin-bottom:12px">
+  <div id="nmCobertura" style="display:none;background:var(--surface2);border:1px solid var(--br);border-radius:10px;padding:12px;margin-bottom:12px">
     <div style="font-size:10px;font-weight:700;color:var(--gold2);letter-spacing:1px;margin-bottom:8px">📊 COBERTURA DO DISPARO</div>
     <div id="nmCoberturaBody"></div>
   </div>
@@ -3000,33 +3001,33 @@ select.sel{
   <div class="mtitle">✉️ DISPARAR CONVITES</div>
   <input type="hidden" id="conviteReuniaoId">
 
-  <div id="conviteResumo" style="background:var(--s2);border-radius:10px;padding:12px;margin-bottom:14px;border-left:3px solid var(--gold)"></div>
+  <div id="conviteResumo" style="background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:14px;border-left:3px solid var(--gold)"></div>
 
   <label class="lbl">Selecionar participantes</label>
-  <div id="conviteParticList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:40px;background:var(--s2);border:1px solid var(--br);border-radius:var(--rs);padding:8px;"></div>
+  <div id="conviteParticList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:40px;background:var(--surface2);border:1px solid var(--br);border-radius:var(--rs);padding:8px;"></div>
   <div style="position:relative;margin-bottom:4px">
     <input class="inp" style="margin:0" placeholder="🔍 Buscar e adicionar membro..." id="conviteBusca" oninput="buscarMembroConviteModal(this.value)">
-    <div id="conviteDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--s1);border:1px solid var(--br2);border-radius:10px;z-index:50;max-height:160px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)"></div>
+    <div id="conviteDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--br2);border-radius:10px;z-index:50;max-height:160px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)"></div>
   </div>
   <button style="background:none;border:none;color:var(--gold2);font-size:11px;cursor:pointer;margin-bottom:14px;padding:0" onclick="selecionarTodosConvite()">+ Selecionar toda a equipe</button>
 
   <label class="lbl">Canais de disparo</label>
   <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:7px 12px">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--surface2);border:1px solid var(--br);border-radius:8px;padding:7px 12px">
       <input type="checkbox" id="cvChkNotif" checked style="accent-color:var(--gold)"> 🔔 Notif. interna
     </label>
-    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:7px 12px">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--surface2);border:1px solid var(--br);border-radius:8px;padding:7px 12px">
       <input type="checkbox" id="cvChkEmail" checked style="accent-color:var(--gold)"> 📧 E-mail
     </label>
-    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:7px 12px">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;background:var(--surface2);border:1px solid var(--br);border-radius:8px;padding:7px 12px">
       <input type="checkbox" id="cvChkWhats" checked style="accent-color:var(--gold)"> 💬 WhatsApp
     </label>
   </div>
 
-  <div id="convitePreview" style="display:none;background:var(--s2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:11px;color:var(--tx2);line-height:1.6;border:1px solid var(--br)"></div>
+  <div id="convitePreview" style="display:none;background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:11px;color:var(--tx2);line-height:1.6;border:1px solid var(--br)"></div>
 
   <!-- COBERTURA -->
-  <div id="cvCobertura" style="display:none;background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:12px;margin-bottom:12px">
+  <div id="cvCobertura" style="display:none;background:var(--surface2);border:1px solid var(--br);border-radius:10px;padding:12px;margin-bottom:12px">
     <div style="font-size:10px;font-weight:700;color:var(--gold2);letter-spacing:1px;margin-bottom:8px">📊 COBERTURA DO DISPARO</div>
     <div id="cvCoberturaBody"></div>
   </div>
@@ -3495,8 +3496,8 @@ function renderDashInteligente() {
       const prog = p.prog || 0;
       const cor = CL[projAtivos.indexOf(p) % CL.length];
       return `<div class="saude-row">
-        <div style="width:36px;height:36px;border-radius:50%;background:conic-gradient(${cor} ${prog*3.6}deg,var(--s3) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:12px">
-          <div style="width:26px;height:26px;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${prog}%</div>
+        <div style="width:36px;height:36px;border-radius:50%;background:conic-gradient(${cor} ${prog*3.6}deg,var(--surface2) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:12px">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${prog}%</div>
         </div>
         <div class="saude-nome">${p.nome}<div style="font-size:10px;color:var(--tx3);font-weight:400">${p.dept||''}</div></div>
         <div class="saude-dots">
@@ -3593,7 +3594,7 @@ function pcard(p) {
       <div><div style="font-size:8px;color:${dc};font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">${p.dept||''}</div><div style="font-family:var(--fh);font-size:15px;letter-spacing:.5px">${p.nome}</div></div>
       <div style="display:flex;gap:5px;flex-shrink:0;margin-left:7px">
         <span class="badge ${bc}">${p.prior}</span>
-        <button onclick="event.stopPropagation();openEditProj('${p.id}')" style="background:var(--s3);border:none;border-radius:6px;padding:3px 7px;font-size:10px;color:var(--tx2);cursor:pointer">✏️</button>
+        <button onclick="event.stopPropagation();openEditProj('${p.id}')" style="background:var(--surface3);border:none;border-radius:6px;padding:3px 7px;font-size:10px;color:var(--tx2);cursor:pointer">✏️</button>
         <button onclick="event.stopPropagation();delProj('${p.id}')" style="background:rgba(239,68,68,.12);border:none;border-radius:6px;padding:3px 7px;font-size:10px;color:#EF4444;cursor:pointer">🗑</button>
       </div>
     </div>
@@ -3686,7 +3687,7 @@ function trow(t) {
       <div style="font-size:10px;color:var(--tx3);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap">
         <span>${p?p.nome.split(' ')[0]:''}</span>
         <span>·</span><span>${m?m.av:t.resp||'—'}</span>
-        <span>·</span><span class="badge" style="background:var(--s3);color:var(--tx3);font-size:8px;padding:1px 5px">${t.status}</span>
+        <span>·</span><span class="badge" style="background:var(--surface3);color:var(--tx3);font-size:8px;padding:1px 5px">${t.status}</span>
       </div>
     </div>
     <div style="display:flex;gap:6px;align-items:center">
@@ -3870,21 +3871,21 @@ async function openDet(type, id) {
     document.getElementById('detContent').innerHTML = `
       <!-- CABEÇALHO INFO -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <div style="background:var(--s2);border-radius:8px;padding:10px">
+        <div style="background:var(--surface2);border-radius:8px;padding:10px">
           <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">PROJETO</div>
           <div style="font-size:12px;font-weight:600">${p?p.nome:'—'}</div>
           ${esp?`<div style="font-size:10px;color:var(--tx3)">📁 ${esp.nome}</div>`:''}
         </div>
-        <div style="background:var(--s2);border-radius:8px;padding:10px">
+        <div style="background:var(--surface2);border-radius:8px;padding:10px">
           <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">RESPONSÁVEL</div>
           <div style="font-size:12px;font-weight:600">${m?m.nome:t.resp||'—'}</div>
           <div style="font-size:10px;color:var(--gold2);cursor:pointer;margin-top:2px" onclick="abrirTransferencia('${id}')">↔️ Transferir</div>
         </div>
-        <div style="background:var(--s2);border-radius:8px;padding:10px">
+        <div style="background:var(--surface2);border-radius:8px;padding:10px">
           <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">DATA INÍCIO</div>
           <input type="date" style="background:none;border:none;color:var(--tx);font-size:12px;font-weight:600;width:100%;cursor:pointer" value="${t.data_inicio||''}" onchange="salvarDataInicio('${id}',this.value)">
         </div>
-        <div style="background:var(--s2);border-radius:8px;padding:10px">
+        <div style="background:var(--surface2);border-radius:8px;padding:10px">
           <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">PRAZO FINAL</div>
           <input type="date" style="background:none;border:none;color:${t.prazo&&new Date(t.prazo)<new Date()?'#EF4444':'var(--tx)'};font-size:12px;font-weight:600;width:100%;cursor:pointer" value="${t.prazo||''}" onchange="salvarPrazo('${id}',this.value)">
         </div>
@@ -3907,7 +3908,7 @@ async function openDet(type, id) {
       </div>
 
       <!-- TIMER -->
-      <div style="background:var(--s2);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:12px">
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:12px">
         <div style="flex:1">
           <div style="font-size:9px;color:var(--tx3);margin-bottom:2px">TEMPO REGISTRADO</div>
           <div style="font-size:16px;font-weight:700;font-family:var(--fh)" id="tempoDisplay">${fmtTempo(tempoGasto)}</div>
@@ -4113,7 +4114,7 @@ function abrirTransferencia(tarefaId) {
   const opts = memb.map(m => `<option value="${m.av}">${m.nome}</option>`).join('');
   const div = document.createElement('div');
   div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center';
-  div.innerHTML = `<div style="background:var(--s1);border-radius:14px;padding:24px;width:320px;border:1px solid var(--br2)">
+  div.innerHTML = `<div style="background:var(--surface2);border-radius:14px;padding:24px;width:320px;border:1px solid var(--br2)">
     <div style="font-family:var(--fh);font-size:16px;margin-bottom:16px">↔️ TRANSFERIR TAREFA</div>
     <label class="lbl">Novo responsável</label>
     <select class="sel" id="transResp">${opts}</select>
@@ -4856,7 +4857,7 @@ function renderMeet() {
   </div>`).join('') || '<div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Nenhum compromisso</div>';
 
   document.getElementById('meetList').innerHTML = reun.map(r => {
-    const par = (r.participantes||[]).map(av => { const m=memb.find(x=>x.av===av); const c=m?m.cor:'#0EA5E9'; return `<div style="width:22px;height:22px;border-radius:50%;background:${c}33;color:${c};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;margin-right:-4px;border:2px solid var(--s1)">${av}</div>`; }).join('');
+    const par = (r.participantes||[]).map(av => { const m=memb.find(x=>x.av===av); const c=m?m.cor:'#0EA5E9'; return `<div style="width:22px;height:22px;border-radius:50%;background:${c}33;color:${c};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;margin-right:-4px;border:2px solid var(--surface2)">${av}</div>`; }).join('');
     return `<div class="mtg">
       <div class="mtgtop">
         <div class="mtgdt"><div class="mtgdy">${r.dia||'—'}</div><div class="mtgmn">${r.mes||''}</div></div>
@@ -5028,7 +5029,7 @@ function abrirModalWhatsapp(participantes, msgEncoded) {
   div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
 
   const itens = participantes.map((m, i) => `
-    <div id="wppItem${i}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--br);border-radius:10px;margin-bottom:8px">
+    <div id="wppItem${i}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--br);border-radius:10px;margin-bottom:8px">
       <div style="width:34px;height:34px;border-radius:10px;background:${m.cor}22;color:${m.cor};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${m.av}</div>
       <div style="flex:1">
         <div style="font-size:12px;font-weight:700">${m.nome}</div>
@@ -5041,16 +5042,16 @@ function abrirModalWhatsapp(participantes, msgEncoded) {
     </div>`).join('');
 
   div.innerHTML = `
-    <div style="background:var(--s1);border:1px solid var(--br2);border-radius:16px;padding:20px;width:100%;max-width:380px;max-height:90vh;overflow-y:auto">
+    <div style="background:var(--surface2);border:1px solid var(--br2);border-radius:16px;padding:20px;width:100%;max-width:380px;max-height:90vh;overflow-y:auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div>
           <div style="font-family:var(--fh);font-size:15px;letter-spacing:.5px">💬 DISPARAR VIA WHATSAPP</div>
           <div style="font-size:11px;color:var(--tx3);margin-top:2px">Clique em Enviar para cada participante</div>
         </div>
-        <button onclick="document.getElementById('mWppDisparo').remove()" style="background:var(--s3);border:none;border-radius:8px;padding:6px 10px;color:var(--tx2);cursor:pointer;font-size:14px">✕</button>
+        <button onclick="document.getElementById('mWppDisparo').remove()" style="background:var(--surface3);border:none;border-radius:8px;padding:6px 10px;color:var(--tx2);cursor:pointer;font-size:14px">✕</button>
       </div>
       ${itens}
-      <button onclick="document.getElementById('mWppDisparo').remove()" style="width:100%;margin-top:8px;background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:10px;font-size:12px;color:var(--tx3);cursor:pointer;font-family:var(--fb)">
+      <button onclick="document.getElementById('mWppDisparo').remove()" style="width:100%;margin-top:8px;background:var(--surface2);border:1px solid var(--br);border-radius:10px;padding:10px;font-size:12px;color:var(--tx3);cursor:pointer;font-family:var(--fb)">
         ✅ Concluído
       </button>
     </div>`;
@@ -5063,7 +5064,7 @@ function enviarWppIndividual(idx, numero, msgEncoded) {
   // Marcar como enviado
   const btn = document.getElementById(`wppBtn${idx}`);
   const item = document.getElementById(`wppItem${idx}`);
-  if (btn) { btn.textContent = '✅ Enviado'; btn.style.background = 'var(--s3)'; btn.style.color = 'var(--tx3)'; btn.disabled = true; }
+  if (btn) { btn.textContent = '✅ Enviado'; btn.style.background = 'var(--surface2)'; btn.style.color = 'var(--tx3)'; btn.disabled = true; }
   if (item) item.style.borderColor = '#22C55E44';
 }
 function renderCobertura(avs, bodyId, covId) {
@@ -5082,7 +5083,7 @@ function renderCobertura(avs, bodyId, covId) {
   const barra = (qtd, total, cor) => {
     const pct = total ? Math.round(qtd/total*100) : 0;
     return `<div style="display:flex;align-items:center;gap:8px">
-      <div style="flex:1;height:5px;background:var(--s3);border-radius:3px">
+      <div style="flex:1;height:5px;background:var(--surface3);border-radius:3px">
         <div style="width:${pct}%;height:100%;background:${cor};border-radius:3px;transition:width .4s"></div>
       </div>
       <span style="font-size:10px;font-weight:700;color:${cor};width:28px;text-align:right">${qtd}/${total}</span>
@@ -5175,7 +5176,7 @@ function buscarMembroConvite(q) {
   if (!res.length) { drop.style.display='none'; return; }
   drop.style.display='block';
   drop.innerHTML = res.slice(0,6).map(m => `
-    <div onclick="adicionarParticNovo('${m.av}')" style="display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+    <div onclick="adicionarParticNovo('${m.av}')" style="display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
       <div style="width:28px;height:28px;border-radius:8px;background:${m.cor}22;color:${m.cor};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">${m.av}</div>
       <div><div style="font-size:12px;font-weight:600">${m.nome}</div><div style="font-size:10px;color:var(--tx3)">${m.cargo||''} · ${m.dept||''}</div></div>
     </div>`).join('');
@@ -5243,7 +5244,7 @@ function buscarMembroConviteModal(q) {
   if (!res.length) { drop.style.display='none'; return; }
   drop.style.display = 'block';
   drop.innerHTML = res.slice(0,6).map(m => `
-    <div onclick="adicionarParticConvite('${m.av}')" style="display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+    <div onclick="adicionarParticConvite('${m.av}')" style="display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
       <div style="width:28px;height:28px;border-radius:8px;background:${m.cor}22;color:${m.cor};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">${m.av}</div>
       <div><div style="font-size:12px;font-weight:600">${m.nome}</div>
       <div style="font-size:10px;color:var(--tx3)">${m.email||'sem e-mail'} · ${m.cargo||''}</div></div>
@@ -5571,7 +5572,7 @@ function renderMembers(l=memb) {
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
         <span class="badge" style="background:${DC[m.dept]||'#C9920A'}18;color:${DC[m.dept]||'#C9920A'};font-size:8px">${(m.dept||'').length>10?(m.dept||'').slice(0,10)+'…':m.dept||''}</span>
         <span style="font-size:12px" title="${coberturaTitle}">${coberturaIcon}</span>
-        <button onclick="editarMembro('${m.id}')" style="background:var(--s3);border:none;border-radius:6px;padding:3px 8px;font-size:10px;color:var(--tx2);cursor:pointer">✏️ Editar</button>
+        <button onclick="editarMembro('${m.id}')" style="background:var(--surface3);border:none;border-radius:6px;padding:3px 8px;font-size:10px;color:var(--tx2);cursor:pointer">✏️ Editar</button>
       </div>
     </div>`;
   }).join('') || '<div style="text-align:center;padding:20px;color:var(--tx3)">Nenhum membro</div>';
@@ -5923,7 +5924,7 @@ async function showAlerts() {
       <div style="font-size:11px;color:var(--tx3)">${n.texto||''}</div>
       <div style="font-size:9px;color:var(--tx3);margin-top:3px">${fmtDate(n.created_at)}</div>
     </div>
-    <button onclick="marcarLida('${n.id}')" style="background:var(--s3);border:none;border-radius:6px;padding:4px 7px;font-size:10px;color:var(--tx2);cursor:pointer">✓</button>
+    <button onclick="marcarLida('${n.id}')" style="background:var(--surface3);border:none;border-radius:6px;padding:4px 7px;font-size:10px;color:var(--tx2);cursor:pointer">✓</button>
   </div>`).join('') : '<div style="text-align:center;padding:30px;color:var(--tx3)">✅ Nenhuma notificação</div>';
 }
 
@@ -6736,15 +6737,15 @@ function renderPainel() {
     const atrasosMedio = tarComPrazo.length ? 'Calculando...' : '—';
     metEl.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
-        <div style="text-align:center;padding:16px;background:var(--s2);border-radius:10px">
+        <div style="text-align:center;padding:16px;background:var(--surface2);border-radius:10px">
           <div style="font-size:24px;font-weight:700;color:var(--gold2)">${tarConcluidas}</div>
           <div style="font-size:11px;color:var(--tx3);margin-top:4px">Tarefas entregues</div>
         </div>
-        <div style="text-align:center;padding:16px;background:var(--s2);border-radius:10px">
+        <div style="text-align:center;padding:16px;background:var(--surface2);border-radius:10px">
           <div style="font-size:24px;font-weight:700;color:#22C55E">${projConcluidos.length}</div>
           <div style="font-size:11px;color:var(--tx3);margin-top:4px">Projetos concluídos</div>
         </div>
-        <div style="text-align:center;padding:16px;background:var(--s2);border-radius:10px">
+        <div style="text-align:center;padding:16px;background:var(--surface2);border-radius:10px">
           <div style="font-size:24px;font-weight:700;color:#3B82F6">${memb.length}</div>
           <div style="font-size:11px;color:var(--tx3);margin-top:4px">Membros ativos</div>
         </div>
@@ -6794,7 +6795,7 @@ async function rodarPrevisaoIA() {
     el.innerHTML = previsoes.map(p => {
       const cor = p.risco >= 70 ? '#EF4444' : p.risco >= 40 ? '#EAB308' : '#22C55E';
       const largura = p.risco;
-      return `<div style="margin-bottom:12px;padding:12px;background:var(--s2);border-radius:10px;border-left:3px solid ${cor}">
+      return `<div style="margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:10px;border-left:3px solid ${cor}">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
           <div style="font-size:13px;font-weight:700">${p.projeto}</div>
           <div style="font-size:16px;font-weight:800;color:${cor}">${p.risco}%</div>
