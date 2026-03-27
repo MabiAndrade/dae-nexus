@@ -3871,36 +3871,36 @@ async function openDet(type, id) {
     document.getElementById('detContent').innerHTML = `
       <!-- CABEÇALHO INFO -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <div style="background:var(--surface2);border-radius:8px;padding:10px">
-          <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">PROJETO</div>
-          <div style="font-size:12px;font-weight:600">${p?p.nome:'—'}</div>
-          ${esp?`<div style="font-size:10px;color:var(--tx3)">📁 ${esp.nome}</div>`:''}
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;border:1px solid var(--border)">
+          <div style="font-size:9px;font-weight:800;color:#4B5563;letter-spacing:.8px;margin-bottom:5px;text-transform:uppercase">PROJETO</div>
+          <div style="font-size:12px;font-weight:700;color:var(--tx)">${p?p.nome:'—'}</div>
+          ${esp?`<div style="font-size:10px;color:#6B7280;margin-top:2px">📁 ${esp.nome}</div>`:''}
         </div>
-        <div style="background:var(--surface2);border-radius:8px;padding:10px">
-          <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">RESPONSÁVEL</div>
-          <div style="font-size:12px;font-weight:600">${m?m.nome:t.resp||'—'}</div>
-          <div style="font-size:10px;color:var(--gold2);cursor:pointer;margin-top:2px" onclick="abrirTransferencia('${id}')">↔️ Transferir</div>
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;border:1px solid var(--border)">
+          <div style="font-size:9px;font-weight:800;color:#4B5563;letter-spacing:.8px;margin-bottom:5px;text-transform:uppercase">RESPONSÁVEL</div>
+          <div style="font-size:12px;font-weight:700;color:var(--tx)">${m?m.nome:t.resp||'—'}</div>
+          <div style="font-size:10px;color:var(--gold2);cursor:pointer;margin-top:3px;font-weight:600" onclick="abrirTransferencia('${id}')">↔️ Transferir</div>
         </div>
-        <div style="background:var(--surface2);border-radius:8px;padding:10px">
-          <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">DATA INÍCIO</div>
-          <input type="date" style="background:none;border:none;color:var(--tx);font-size:12px;font-weight:600;width:100%;cursor:pointer" value="${t.data_inicio||''}" onchange="salvarDataInicio('${id}',this.value)">
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;border:1px solid var(--border)">
+          <div style="font-size:9px;font-weight:800;color:#4B5563;letter-spacing:.8px;margin-bottom:5px;text-transform:uppercase">DATA INÍCIO</div>
+          <input type="date" style="background:none;border:none;color:var(--tx);font-size:12px;font-weight:700;width:100%;cursor:pointer" value="${t.data_inicio||''}" onchange="salvarDataInicio('${id}',this.value)">
         </div>
-        <div style="background:var(--surface2);border-radius:8px;padding:10px">
-          <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">PRAZO FINAL</div>
-          <input type="date" style="background:none;border:none;color:${t.prazo&&new Date(t.prazo)<new Date()?'#EF4444':'var(--tx)'};font-size:12px;font-weight:600;width:100%;cursor:pointer" value="${t.prazo||''}" onchange="salvarPrazo('${id}',this.value)">
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;border:1px solid var(--border)">
+          <div style="font-size:9px;font-weight:800;color:#4B5563;letter-spacing:.8px;margin-bottom:5px;text-transform:uppercase">PRAZO FINAL</div>
+          <input type="date" style="background:none;border:none;color:${t.prazo&&new Date(t.prazo)<new Date()?'#EF4444':'var(--tx)'};font-size:12px;font-weight:700;width:100%;cursor:pointer" value="${t.prazo||''}" onchange="salvarPrazo('${id}',this.value)">
         </div>
       </div>
 
       <!-- STATUS E PRIORIDADE -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
         <div>
-          <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">STATUS</div>
+          <div style="font-size:9px;font-weight:800;color:#4B5563;letter-spacing:.8px;margin-bottom:5px;text-transform:uppercase">STATUS</div>
           <select class="sel" style="margin:0" onchange="salvarStatus('${id}',this.value)">
             ${statusOpts.map(s=>`<option value="${s}" ${t.status===s?'selected':''}>${s}</option>`).join('')}
           </select>
         </div>
         <div>
-          <div style="font-size:9px;color:var(--tx3);margin-bottom:4px">PRIORIDADE</div>
+          <div style="font-size:9px;font-weight:800;color:#4B5563;letter-spacing:.8px;margin-bottom:5px;text-transform:uppercase">PRIORIDADE</div>
           <select class="sel" style="margin:0" onchange="salvarPrioridade('${id}',this.value)">
             ${priorOpts.map(s=>`<option value="${s}" ${t.prior===s?'selected':''}>${s}</option>`).join('')}
           </select>
@@ -3908,10 +3908,10 @@ async function openDet(type, id) {
       </div>
 
       <!-- TIMER -->
-      <div style="background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:12px">
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:12px;border:1px solid var(--border)">
         <div style="flex:1">
-          <div style="font-size:9px;color:var(--tx3);margin-bottom:2px">TEMPO REGISTRADO</div>
-          <div style="font-size:16px;font-weight:700;font-family:var(--fh)" id="tempoDisplay">${fmtTempo(tempoGasto)}</div>
+          <div style="font-size:9px;font-weight:800;color:#4B5563;letter-spacing:.8px;margin-bottom:4px;text-transform:uppercase">TEMPO REGISTRADO</div>
+          <div style="font-size:16px;font-weight:700;font-family:var(--fh);color:var(--tx)" id="tempoDisplay">${fmtTempo(tempoGasto)}</div>
         </div>
         <button id="btnTimer" onclick="toggleTimer('${id}')" style="background:${isTimerOn?'rgba(239,68,68,0.2)':'rgba(34,197,94,0.2)'};border:1px solid ${isTimerOn?'#EF4444':'#22C55E'};color:${isTimerOn?'#EF4444':'#22C55E'};border-radius:8px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:700">
           ${isTimerOn?'⏹ PARAR':'▶ INICIAR'}
@@ -3930,10 +3930,11 @@ async function openDet(type, id) {
 
       <!-- COMENTÁRIOS -->
       <div class="sl" style="margin-top:4px">💬 Comentários</div>
-      <div id="comsBox">${comsHtml}</div>
+      <div id="comsBox" style="max-height:200px;overflow-y:auto;margin-bottom:6px">${comsHtml}</div>
       <div style="display:flex;gap:6px;margin-top:8px">
-        <input id="comInp" class="inp" style="margin:0;flex:1;font-size:12px;padding:8px 10px" placeholder="Escrever comentário...">
-        <button onclick="addComentario('${id}')" class="btnp" style="padding:8px 12px;font-size:11px;width:auto">✉️</button>
+        <input id="comInp" class="inp" style="margin:0;flex:1;font-size:12px;padding:8px 10px" placeholder="Escrever comentário... (Enter para enviar)"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addComentario('${id}');}">
+        <button onclick="addComentario('${id}')" class="btnp" style="padding:8px 14px;font-size:13px;width:auto;min-width:42px">✉️</button>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-link" onclick="togTask('${id}');openDet('task','${id}')">${t.ok?'↩️ Reabrir':'✅ Concluir'}</button>
@@ -3942,11 +3943,27 @@ async function openDet(type, id) {
       </div>`;
     // Retomar display do timer se estiver ativo
     if (isTimerOn) {
-      if (!timerInterval) iniciarTimerUI(id, tempoGasto);
+      // Retomar UI do timer se já estava rodando (sem reiniciar timerInicio)
+      if (!timerInterval) {
+        const base = tempoGasto;
+        timerInterval = setInterval(() => {
+          const elapsed = timerInicio ? Math.floor((Date.now() - timerInicio) / 1000) : 0;
+          const el = document.getElementById('tempoDisplay');
+          if (el) el.textContent = fmtTempo(base + elapsed);
+        }, 1000);
+      }
       // Atualizar display imediatamente
       const elapsed = timerInicio ? Math.floor((Date.now() - timerInicio) / 1000) : 0;
       const el = document.getElementById('tempoDisplay');
       if (el) el.textContent = fmtTempo(tempoGasto + elapsed);
+      // Garantir botão no estado certo
+      const btn = document.getElementById('btnTimer');
+      if (btn) {
+        btn.textContent = '⏹ PARAR';
+        btn.style.background = 'rgba(239,68,68,0.2)';
+        btn.style.borderColor = '#EF4444';
+        btn.style.color = '#EF4444';
+      }
     }
   } else if (type==='proj') {
     const p = proj.find(x => x.id===id); if (!p) return;
@@ -3982,31 +3999,45 @@ async function openDet(type, id) {
 async function addComentario(tarefaId) {
   const inp = document.getElementById('comInp');
   const texto = inp?.value?.trim();
-  if (!texto) return;
-  const { data, error } = await safeDb.from('comentarios').insert([{ tarefa_id:tarefaId, autor:curUser?.av||'MA', texto }]).select().single();
-  if (error) { showToast('❌ Erro: ' + error.message); return; }
-  inp.value = '';
-  const m = memb.find(x => x.av===curUser?.av);
-  const comsBox = document.getElementById('comsBox');
-  if (comsBox) {
-    const novoHtml = `<div style="display:flex;gap:8px;margin-bottom:10px">
-      <div style="width:26px;height:26px;border-radius:8px;background:${m?.cor||'#C9920A'}22;color:${m?.cor||'#C9920A'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${curUser?.av||'MA'}</div>
-      <div style="flex:1"><div style="font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:2px">${m?.nome||'Você'} <span style="color:var(--tx3);font-weight:400">agora</span></div><div style="font-size:12px;color:var(--tx)">${texto}</div></div>
-    </div>`;
-    comsBox.innerHTML += novoHtml;
-    comsBox.scrollTop = 9999;
+  if (!texto) { inp?.focus(); return; }
+  // Desabilitar botão enquanto salva
+  const btn = inp?.nextElementSibling;
+  if (btn) btn.disabled = true;
+  try {
+    const { data, error } = await safeDb.from('comentarios').insert([{ tarefa_id:tarefaId, autor:curUser?.av||'MA', texto }]).select().single();
+    if (error) { showToast('❌ Erro ao salvar: ' + (error.message||'tente novamente')); return; }
+    inp.value = '';
+    const m = memb.find(x => x.av===curUser?.av);
+    const comsBox = document.getElementById('comsBox');
+    if (comsBox) {
+      // Remover mensagem "nenhum comentário" se existir
+      const vazio = comsBox.querySelector('div[style*="color:var(--tx3)"]');
+      if (vazio && vazio.textContent.includes('Nenhum')) vazio.remove();
+      const novoHtml = `<div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="width:26px;height:26px;border-radius:8px;background:${m?.cor||'#C9920A'}22;color:${m?.cor||'#C9920A'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${curUser?.av||'MA'}</div>
+        <div style="flex:1"><div style="font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:2px">${m?.nome||'Você'} <span style="color:var(--tx3);font-weight:400">agora</span></div><div style="font-size:12px;color:var(--tx)">${texto}</div></div>
+      </div>`;
+      comsBox.innerHTML += novoHtml;
+      comsBox.scrollTop = comsBox.scrollHeight;
+    }
+    await logAtividade('comentario', 'Comentário adicionado', texto.slice(0,60), curUser?.av, null, tarefaId, '#3B82F6');
+    showToast('💬 Comentário enviado!');
+    inp?.focus();
+  } finally {
+    if (btn) btn.disabled = false;
   }
-  await logAtividade('comentario', 'Comentário adicionado', texto.slice(0,60), curUser?.av, null, tarefaId, '#3B82F6');
-  showToast('💬 Comentário enviado!');
 }
 
 
 // ══ FUNÇÕES DO PAINEL DE TAREFA ══════════════════════════════════
 
 function fmtTempo(segundos) {
-  if (!segundos) return '0h 00min';
+  if (!segundos || segundos < 0) return '0h 00min';
   const h = Math.floor(segundos / 3600);
   const m = Math.floor((segundos % 3600) / 60);
+  const s = Math.floor(segundos % 60);
+  if (h === 0 && m === 0) return `${s}s`;
+  if (h === 0) return `${m}min ${String(s).padStart(2,'0')}s`;
   return `${h}h ${String(m).padStart(2,'0')}min`;
 }
 
