@@ -5133,24 +5133,45 @@ function formatarAtaWhatsapp(r, ataTexto, participantes) {
   const local = r?.local || '—';
   const titulo = r?.tit || 'Reunião';
 
-  // Converter markdown básico para WhatsApp: **text** → *text*, # → *TEXT*
-  const corpo = ataTexto
-    .replace(/\*\*(.*?)\*\*/g, '*$1*')
-    .replace(/^#{1,3}\s+(.+)$/gm, '*$1*')
-    .replace(/^[-•]\s+/gm, '• ');
+  // Processar corpo linha a linha para formatação WhatsApp
+  const linhas = ataTexto.split('\n');
+  const corpo = linhas.map(linha => {
+    const l = linha.trim();
+    if (!l) return '';
+    // Título principal (ex: "ATA DE REUNIÃO – ...")
+    if (/^ATA DE REUNI/i.test(l)) return `*${l}*`;
+    // Seções numeradas (ex: "1. Participantes", "2. Pauta")
+    if (/^\d+\.\s+\S/.test(l)) return `\n*${l.toUpperCase()}*`;
+    // Subseções (ex: "3.1 Algo", "3.2 Algo")
+    if (/^\d+\.\d+\s+\S/.test(l)) return `\n*${l}*`;
+    // Linhas com "Data:", "Objetivo:", "Local:", "Hora:" → negrito chave
+    if (/^(Data|Objetivo|Local|Hora|Pauta|Período|Conclus):/i.test(l)) {
+      return l.replace(/^([^:]+):/, '*$1:*');
+    }
+    // Linhas "Ficou acordado", "Deliberações", "Decisões", "Encaminhamentos"
+    if (/^(Ficou|Delibera|Decis|Encaminhamento|Ação|Prazo)/i.test(l)) {
+      return `› ${l}`;
+    }
+    // Bullets e listas
+    if (/^[-•*]\s+/.test(l)) return `  • ${l.replace(/^[-•*]\s+/, '')}`;
+    // Nomes soltos (participantes) — linha curta sem pontuação = item de lista
+    if (l.length < 40 && !/[:.,;]/.test(l) && !/^[A-Z]{2,}/.test(l)) return `  • ${l}`;
+    return l;
+  }).filter((l, i, arr) => !(l === '' && arr[i-1] === '')).join('\n'); // remove linhas duplas
 
-  return `📋 *ATA DE REUNIÃO*
-━━━━━━━━━━━━━━━━━━━━
-*${titulo}*
-📅 ${data} às ${hora}
-📍 ${local}
-👥 ${participantes || '—'}
-━━━━━━━━━━━━━━━━━━━━
+  return `🗂️ *ATA DE REUNIÃO*
+━━━━━━━━━━━━━━━━━━
+📌 *${titulo}*
+━━━━━━━━━━━━━━━━━━
+📅 *Data:* ${data} às ${hora}
+📍 *Local:* ${local}
+👥 *Participantes:* ${participantes || '—'}
+━━━━━━━━━━━━━━━━━━
 
-${corpo}
+${corpo.trim()}
 
-━━━━━━━━━━━━━━━━━━━━
-_Enviado via DAE Nexus.AI_`;
+━━━━━━━━━━━━━━━━━━
+_📲 Enviado via DAE Nexus.AI_`;
 }
 
 // ══════════════════════════════════════════════════════════════════
