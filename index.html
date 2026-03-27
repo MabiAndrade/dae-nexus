@@ -1337,7 +1337,7 @@ select,input[type="checkbox"]{accent-color:var(--brand);}
 }
 .mtgdy{font-size:22px;font-weight:900;color:#fff;line-height:1;}
 .mtgmn{font-size:8px;color:rgba(255,255,255,0.75);font-weight:700;text-transform:uppercase;}
-.mtgacts{display:flex;gap:7px;}
+.mtgacts{display:flex;gap:7px;flex-wrap:wrap;}
 .bmtg{
   flex:1;padding:8px;border-radius:9px;border:none;
   font-family:var(--fb);font-size:11px;font-weight:700;
@@ -4936,6 +4936,8 @@ function renderMeet() {
         ${r.link?`<button class="bmtg bmtgp" onclick="window.open('${r.link}','_blank')">📹 Entrar</button>`:''}
         <button class="bmtg bmtgs" onclick="togAta('${r.id}')">📝 ${r.ata?'Ver Ata':'Ata'}</button>
         <button class="bmtg bmtgs" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(14,165,233,.2));border-color:rgba(139,92,246,.4);color:#C4B5FD" onclick="gerarAtaIA('${r.id}')">✨ Gerar Ata</button>
+        <button class="bmtg bmtgs" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#22C55E" onclick="compartilharAtaWpp('${r.id}')">📲 WhatsApp</button>
+        <button class="bmtg bmtgs" style="background:rgba(14,165,233,.1);border-color:rgba(14,165,233,.3);color:var(--gold2)" onclick="copiarAtaFormatada('${r.id}')">📋 Copiar</button>
         <button class="bmtg bmtgs" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#22C55E" onclick="abrirModalConvite('${r.id}')">✉️ Convidar</button>
       </div>
       <div class="atabox" id="ata-${r.id}">
@@ -4943,8 +4945,6 @@ function renderMeet() {
         <textarea class="atainp" placeholder="A ata aparecerá aqui após geração pela IA, ou escreva manualmente..." id="atat-${r.id}">${r.ata||''}</textarea>
         <div style="display:flex;gap:6px;margin-top:6px">
           <button class="btnp" style="padding:8px 12px;font-size:11px;flex:1" onclick="saveAta('${r.id}')">💾 SALVAR ATA</button>
-          <button style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);border-radius:8px;padding:8px 12px;font-size:11px;color:#16A34A;cursor:pointer;font-weight:700" onclick="compartilharAtaWpp('${r.id}')">📲 WhatsApp</button>
-          <button style="background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.3);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--gold2);cursor:pointer;font-weight:700" onclick="copiarAtaFormatada('${r.id}')">📋 Copiar</button>
         </div>
       </div>
     </div>`;
