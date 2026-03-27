@@ -4936,9 +4936,15 @@ function renderMeet() {
         ${r.link?`<button class="bmtg bmtgp" onclick="window.open('${r.link}','_blank')">📹 Entrar</button>`:''}
         <button class="bmtg bmtgs" onclick="togAta('${r.id}')">📝 ${r.ata?'Ver Ata':'Ata'}</button>
         <button class="bmtg bmtgs" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(14,165,233,.2));border-color:rgba(139,92,246,.4);color:#C4B5FD" onclick="gerarAtaIA('${r.id}')">✨ Gerar Ata</button>
-        <button class="bmtg bmtgs" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#22C55E" onclick="compartilharAtaWpp('${r.id}')">📲 WhatsApp</button>
-        <button class="bmtg bmtgs" style="background:rgba(14,165,233,.1);border-color:rgba(14,165,233,.3);color:var(--gold2)" onclick="copiarAtaFormatada('${r.id}')">📋 Copiar</button>
         <button class="bmtg bmtgs" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#22C55E" onclick="abrirModalConvite('${r.id}')">✉️ Convidar</button>
+      </div>
+      <div style="display:flex;gap:7px;margin-top:6px;padding:0 0 4px 0">
+        <button onclick="compartilharAtaWpp('${r.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(135deg,#22C55E,#16A34A);border:none;border-radius:10px;padding:10px 0;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--fh);letter-spacing:.3px">
+          📲 Enviar Ata no WhatsApp
+        </button>
+        <button onclick="copiarAtaFormatada('${r.id}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:10px;padding:10px 0;font-size:12px;font-weight:700;color:#0EA5E9;cursor:pointer;font-family:var(--fh);letter-spacing:.3px">
+          📋 Copiar Ata Formatada
+        </button>
       </div>
       <div class="atabox" id="ata-${r.id}">
         <div id="ata-status-${r.id}" style="display:none;font-size:11px;color:var(--gold2);margin-bottom:6px;display:flex;align-items:center;gap:6px"><span style="animation:pulse 1s infinite">✨</span> <span id="ata-status-txt-${r.id}">Gerando ata com IA...</span></div>
