@@ -3852,8 +3852,19 @@ async function openDet(type, id) {
     const m = memb.find(x => x.av===t.resp);
     const pc = {urgente:'#EF4444',alta:'#F97316',media:'#EAB308',baixa:'#22C55E'}[t.prior]||'#C9920A';
     document.getElementById('detTitle').textContent = t.tit;
-    // Carregar comentários
-    const { data: coms } = await safeDb.from('comentarios').select('*').eq('tarefa_id', id).order('created_at');
+    // Verificar se tarefa existe no Supabase
+    const isLocal = String(id).startsWith('local_');
+    if (!isLocal) {
+      const { data: tarefaCheck, error: errCheck } = await safeDb.from('tarefas').select('id').eq('id', id).single();
+      if (errCheck || !tarefaCheck) {
+        showToast('⚠️ Tarefa desincronizada. Recarregando dados...');
+        panel.classList.remove('on');
+        await loadData();
+        return;
+      }
+    }
+    // Carregar comentários (apenas tarefas no Supabase)
+    const { data: coms } = isLocal ? { data: [] } : await safeDb.from('comentarios').select('*').eq('tarefa_id', id).order('created_at');
     const comsHtml = (coms||[]).map(c => {
       const cm = memb.find(x => x.av===c.autor);
       return `<div style="display:flex;gap:8px;margin-bottom:10px">
@@ -3931,11 +3942,13 @@ async function openDet(type, id) {
       <!-- COMENTÁRIOS -->
       <div class="sl" style="margin-top:4px">💬 Comentários</div>
       <div id="comsBox" style="max-height:200px;overflow-y:auto;margin-bottom:6px">${comsHtml}</div>
-      <div style="display:flex;gap:6px;margin-top:8px">
+      ${isLocal ? `<div style="font-size:11px;color:#F97316;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:8px 10px;margin-top:8px">
+        ⚠️ Tarefa local — salve-a no Supabase antes de comentar.
+      </div>` : `<div style="display:flex;gap:6px;margin-top:8px">
         <input id="comInp" class="inp" style="margin:0;flex:1;font-size:12px;padding:8px 10px" placeholder="Escrever comentário... (Enter para enviar)"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addComentario('${id}');}">
         <button onclick="addComentario('${id}')" class="btnp" style="padding:8px 14px;font-size:13px;width:auto;min-width:42px">✉️</button>
-      </div>
+      </div>`}
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-link" onclick="togTask('${id}');openDet('task','${id}')">${t.ok?'↩️ Reabrir':'✅ Concluir'}</button>
         <button class="btn-link" onclick="openEditTask('${id}');closeDet()">✏️ Editar</button>
@@ -4000,19 +4013,39 @@ async function addComentario(tarefaId) {
   const inp = document.getElementById('comInp');
   const texto = inp?.value?.trim();
   if (!texto) { inp?.focus(); return; }
-  // Desabilitar botão enquanto salva
+
+  // Bloquear comentários em tarefas locais (não sincronizadas com Supabase)
+  if (!tarefaId || String(tarefaId).startsWith('local_')) {
+    showToast('⚠️ Esta tarefa ainda não foi sincronizada. Feche e reabra para comentar.');
+    return;
+  }
+
+  // Verificar se a tarefa realmente existe no Supabase antes de comentar
+  const { data: tarefaExiste, error: errVerif } = await safeDb.from('tarefas').select('id').eq('id', tarefaId).single();
+  if (errVerif || !tarefaExiste) {
+    showToast('❌ Tarefa não encontrada no banco. Recarregue a página e tente novamente.');
+    return;
+  }
+
   const btn = inp?.nextElementSibling;
   if (btn) btn.disabled = true;
   try {
-    const { data, error } = await safeDb.from('comentarios').insert([{ tarefa_id:tarefaId, autor:curUser?.av||'MA', texto }]).select().single();
-    if (error) { showToast('❌ Erro ao salvar: ' + (error.message||'tente novamente')); return; }
+    const { data, error } = await safeDb.from('comentarios').insert([{ tarefa_id: tarefaId, autor: curUser?.av||'MA', texto }]).select().single();
+    if (error) {
+      if (error.message?.includes('foreign key')) {
+        showToast('❌ Esta tarefa não existe no banco. Recarregue a página.');
+      } else {
+        showToast('❌ Erro ao salvar: ' + (error.message||'tente novamente'));
+      }
+      return;
+    }
     inp.value = '';
     const m = memb.find(x => x.av===curUser?.av);
     const comsBox = document.getElementById('comsBox');
     if (comsBox) {
       // Remover mensagem "nenhum comentário" se existir
-      const vazio = comsBox.querySelector('div[style*="color:var(--tx3)"]');
-      if (vazio && vazio.textContent.includes('Nenhum')) vazio.remove();
+      const items = comsBox.querySelectorAll('div');
+      items.forEach(d => { if (d.textContent.includes('Nenhum comentário')) d.remove(); });
       const novoHtml = `<div style="display:flex;gap:8px;margin-bottom:10px">
         <div style="width:26px;height:26px;border-radius:8px;background:${m?.cor||'#C9920A'}22;color:${m?.cor||'#C9920A'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${curUser?.av||'MA'}</div>
         <div style="flex:1"><div style="font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:2px">${m?.nome||'Você'} <span style="color:var(--tx3);font-weight:400">agora</span></div><div style="font-size:12px;color:var(--tx)">${texto}</div></div>
@@ -4910,7 +4943,8 @@ function renderMeet() {
         <textarea class="atainp" placeholder="A ata aparecerá aqui após geração pela IA, ou escreva manualmente..." id="atat-${r.id}">${r.ata||''}</textarea>
         <div style="display:flex;gap:6px;margin-top:6px">
           <button class="btnp" style="padding:8px 12px;font-size:11px;flex:1" onclick="saveAta('${r.id}')">💾 SALVAR ATA</button>
-          ${r.ata?`<button style="background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.3);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--gold2);cursor:pointer" onclick="copiarAta('${r.id}')">📋 Copiar</button>`:''}
+          <button style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);border-radius:8px;padding:8px 12px;font-size:11px;color:#16A34A;cursor:pointer;font-weight:700" onclick="compartilharAtaWpp('${r.id}')">📲 WhatsApp</button>
+          <button style="background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.3);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--gold2);cursor:pointer;font-weight:700" onclick="copiarAtaFormatada('${r.id}')">📋 Copiar</button>
         </div>
       </div>
     </div>`;
@@ -5042,6 +5076,75 @@ function copiarAta(id) {
   const t = document.getElementById('atat-'+id);
   if (!t?.value) { showToast('⚠️ Nenhuma ata para copiar'); return; }
   navigator.clipboard.writeText(t.value).then(() => showToast('📋 Ata copiada!')).catch(() => showToast('❌ Erro ao copiar'));
+}
+
+// Copiar ata com formatação WhatsApp (*negrito*, emojis, separadores)
+function copiarAtaFormatada(id) {
+  const t = document.getElementById('atat-'+id);
+  if (!t?.value?.trim()) { showToast('⚠️ Nenhuma ata para copiar'); return; }
+  const r = reun.find(x => x.id === id);
+  const par = (r?.participantes||[]).map(av => { const m = memb.find(x => x.av === av); return m ? m.nome.split(' ')[0] : av; }).join(', ');
+  const texto = formatarAtaWhatsapp(r, t.value, par);
+  navigator.clipboard.writeText(texto)
+    .then(() => showToast('📋 Ata copiada com formatação WhatsApp!'))
+    .catch(() => {
+      // Fallback para navegadores sem permissão
+      const ta = document.createElement('textarea');
+      ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('📋 Ata copiada!');
+    });
+}
+
+// Compartilhar ata via WhatsApp (abre modal de disparo individual)
+function compartilharAtaWpp(id) {
+  const t = document.getElementById('atat-'+id);
+  if (!t?.value?.trim()) { showToast('⚠️ Gere ou escreva a ata antes de compartilhar'); return; }
+  const r = reun.find(x => x.id === id);
+  const par = (r?.participantes||[]).map(av => { const m = memb.find(x => x.av === av); return m ? m.nome.split(' ')[0] : av; }).join(', ');
+  const texto = formatarAtaWhatsapp(r, t.value, par);
+  const msgEncoded = encodeURIComponent(texto);
+
+  // Participantes com WhatsApp cadastrado
+  const comWpp = (r?.participantes||[]).map(av => memb.find(x => x.av === av)).filter(m => m?.whatsapp);
+
+  if (comWpp.length === 0) {
+    // Nenhum com WhatsApp cadastrado — abrir wa.me genérico para escolher contato
+    window.open('https://wa.me/?text=' + msgEncoded, '_blank');
+    showToast('📲 WhatsApp Web aberto com a ata!');
+    return;
+  }
+
+  // Há participantes com WhatsApp cadastrado — abrir modal de disparo individual
+  abrirModalWhatsapp(comWpp, msgEncoded);
+}
+
+// Formatar ata no padrão WhatsApp
+function formatarAtaWhatsapp(r, ataTexto, participantes) {
+  const data = r ? `${r.dia||'—'}/${r.mes||'—'}` : new Date().toLocaleDateString('pt-BR');
+  const hora = r?.hora || '—';
+  const local = r?.local || '—';
+  const titulo = r?.tit || 'Reunião';
+
+  // Converter markdown básico para WhatsApp: **text** → *text*, # → *TEXT*
+  const corpo = ataTexto
+    .replace(/\*\*(.*?)\*\*/g, '*$1*')
+    .replace(/^#{1,3}\s+(.+)$/gm, '*$1*')
+    .replace(/^[-•]\s+/gm, '• ');
+
+  return `📋 *ATA DE REUNIÃO*
+━━━━━━━━━━━━━━━━━━━━
+*${titulo}*
+📅 ${data} às ${hora}
+📍 ${local}
+👥 ${participantes || '—'}
+━━━━━━━━━━━━━━━━━━━━
+
+${corpo}
+
+━━━━━━━━━━━━━━━━━━━━
+_Enviado via DAE Nexus.AI_`;
 }
 
 // ══════════════════════════════════════════════════════════════════
