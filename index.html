@@ -5128,50 +5128,100 @@ function compartilharAtaWpp(id) {
 
 // Formatar ata no padrão WhatsApp
 function formatarAtaWhatsapp(r, ataTexto, participantes) {
-  const data = r ? `${r.dia||'—'}/${r.mes||'—'}` : new Date().toLocaleDateString('pt-BR');
+  const agora = new Date();
+  const dataHoraEnvio = agora.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  const data = r ? `${r.dia||'—'}/${r.mes||'—'}` : agora.toLocaleDateString('pt-BR');
   const hora = r?.hora || '—';
   const local = r?.local || '—';
   const titulo = r?.tit || 'Reunião';
 
-  // Processar corpo linha a linha para formatação WhatsApp
+  // Processar corpo: detectar seções, subseções, decisões, nomes
   const linhas = ataTexto.split('\n');
-  const corpo = linhas.map(linha => {
-    const l = linha.trim();
-    if (!l) return '';
-    // Título principal (ex: "ATA DE REUNIÃO – ...")
-    if (/^ATA DE REUNI/i.test(l)) return `*${l}*`;
-    // Seções numeradas (ex: "1. Participantes", "2. Pauta")
-    if (/^\d+\.\s+\S/.test(l)) return `\n*${l.toUpperCase()}*`;
-    // Subseções (ex: "3.1 Algo", "3.2 Algo")
-    if (/^\d+\.\d+\s+\S/.test(l)) return `\n*${l}*`;
-    // Linhas com "Data:", "Objetivo:", "Local:", "Hora:" → negrito chave
-    if (/^(Data|Objetivo|Local|Hora|Pauta|Período|Conclus):/i.test(l)) {
-      return l.replace(/^([^:]+):/, '*$1:*');
-    }
-    // Linhas "Ficou acordado", "Deliberações", "Decisões", "Encaminhamentos"
-    if (/^(Ficou|Delibera|Decis|Encaminhamento|Ação|Prazo)/i.test(l)) {
-      return `› ${l}`;
-    }
-    // Bullets e listas
-    if (/^[-•*]\s+/.test(l)) return `  • ${l.replace(/^[-•*]\s+/, '')}`;
-    // Nomes soltos (participantes) — linha curta sem pontuação = item de lista
-    if (l.length < 40 && !/[:.,;]/.test(l) && !/^[A-Z]{2,}/.test(l)) return `  • ${l}`;
-    return l;
-  }).filter((l, i, arr) => !(l === '' && arr[i-1] === '')).join('\n'); // remove linhas duplas
+  const blocos = [];
+  let emListaNomes = false;
 
-  return `🗂️ *ATA DE REUNIÃO*
-━━━━━━━━━━━━━━━━━━
+  for (let i = 0; i < linhas.length; i++) {
+    const l = linhas[i].trim();
+    if (!l) { emListaNomes = false; blocos.push(''); continue; }
+
+    // Ignorar linha de título repetido (já está no cabeçalho)
+    if (/^ATA DE REUNI/i.test(l)) continue;
+    // Ignorar linhas de data/objetivo que já estão no cabeçalho
+    if (/^(Data|Objetivo)\s*:/i.test(l) && i < 6) continue;
+
+    // Seção principal numerada: "1. Participantes" → cabeçalho destacado
+    if (/^\d+\.\s+[A-ZÀ-Ú]/.test(l)) {
+      const num = l.match(/^(\d+)\.\s+(.+)/);
+      if (num) {
+        blocos.push('');
+        blocos.push(`┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄`);
+        blocos.push(`*${num[1]}. ${num[2].toUpperCase()}*`);
+        blocos.push(`┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄`);
+        emListaNomes = /participante|presença|membro/i.test(l);
+        continue;
+      }
+    }
+
+    // Subseção: "3.1 Algo" ou "3.1. Algo"
+    if (/^\d+\.\d+[\s.]/.test(l)) {
+      blocos.push('');
+      blocos.push(`▸ *${l}*`);
+      continue;
+    }
+
+    // Linha de presença/nomes (linha curta, sem pontuação, após seção participantes)
+    if (emListaNomes && l.length < 45 && !/[:;]/.test(l) && !/^(A |O |As |Os )/i.test(l)) {
+      blocos.push(`   👤 ${l}`);
+      continue;
+    }
+
+    // Decisões / acordos / encaminhamentos
+    if (/^(Ficou acordado|Delibera|Decis[ãa]o|Encaminhamento|Ação definida|Prazo)/i.test(l)) {
+      blocos.push(`✅ _${l}_`);
+      continue;
+    }
+
+    // Linhas com "chave: valor"
+    if (/^[A-ZÀ-Úa-zà-ú][^:]{1,30}:\s+\S/.test(l)) {
+      blocos.push(l.replace(/^([^:]+):/, '*$1:*'));
+      continue;
+    }
+
+    // Bullets
+    if (/^[-•]\s+/.test(l)) {
+      blocos.push(`  • ${l.replace(/^[-•]\s+/, '')}`);
+      continue;
+    }
+
+    blocos.push(l);
+  }
+
+  // Limpar linhas em branco duplicadas
+  const corpo = blocos
+    .reduce((acc, l) => { if (l === '' && acc[acc.length-1] === '') return acc; acc.push(l); return acc; }, [])
+    .join('\n').trim();
+
+  const nomeMes = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'][agora.getMonth()];
+
+  return `╔══════════════════════╗
+║  🗂️  *ATA DE REUNIÃO*  ║
+╚══════════════════════╝
+
 📌 *${titulo}*
-━━━━━━━━━━━━━━━━━━
-📅 *Data:* ${data} às ${hora}
-📍 *Local:* ${local}
-👥 *Participantes:* ${participantes || '—'}
-━━━━━━━━━━━━━━━━━━
 
-${corpo.trim()}
+📅 *${data} às ${hora}*
+📍 ${local}
+👥 ${participantes || '—'}
 
-━━━━━━━━━━━━━━━━━━
-_📲 Enviado via DAE Nexus.AI_`;
+━━━━━━━━━━━━━━━━━━━━━━
+
+${corpo}
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+> 🤖 *Gerado e enviado automaticamente pelo*
+> *DAE Nexus.AI · Sudoeste Informática*
+> _${dataHoraEnvio}_`;
 }
 
 // ══════════════════════════════════════════════════════════════════
