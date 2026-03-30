@@ -4005,10 +4005,9 @@ async function openDet(type, id) {
       <div class="sl" style="margin-top:4px">📎 Anexos</div>
       <div id="anexosBox" style="margin-bottom:8px"></div>
       <div style="display:flex;gap:6px;margin-bottom:12px">
-        <button onclick="document.getElementById('anexoInput_${id}').click()" style="flex:1;background:var(--surface2);border:1.5px dashed var(--border);border-radius:8px;padding:8px;font-size:11px;color:var(--tx2);cursor:pointer;font-weight:600">
+        <button onclick="triggerAnexoInput('${id}')" style="flex:1;background:var(--surface2);border:1.5px dashed var(--border);border-radius:8px;padding:8px;font-size:11px;color:var(--tx2);cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px">
           📎 Anexar arquivo
         </button>
-        <input type="file" id="anexoInput_${id}" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp,.mp4,.mp3,.wav,.zip,.txt" style="display:none" onchange="uploadAnexoTarefa('${id}',this.files)">
       </div>
 
       <div style="margin-top:4px;display:flex;gap:8px;flex-wrap:wrap">
@@ -5179,7 +5178,7 @@ function fmtBytes(b) {
 // ── Carregar arquivos do Supabase Storage ───────────────────────
 async function carregarArquivos() {
   try {
-    const { data, error } = await db.storage.from(ARQ_BUCKET).list('', { limit: 200, sortBy: { column: 'created_at', order: 'desc' } });
+    const { data, error } = await db.storage.from(ARQ_BUCKET).list('', { limit: 200, sortBy: { column: 'name', order: 'asc' } });
     if (error) throw error;
     arquivosDb = data || [];
   } catch(e) {
@@ -5226,7 +5225,7 @@ async function renderArquivos() {
         : `<div style="height:80px;background:${info.cor}18;display:flex;align-items:center;justify-content:center;font-size:36px">${info.ico}</div>`
       }
       <div style="padding:10px;flex:1">
-        <div style="font-size:11px;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px" title="${f.name}">${f.name}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px" title="${f.name}">${f.name.replace(/^\d+_/, '')}</div>
         <div style="font-size:10px;color:var(--tx3)">${tamanho} · ${data}</div>
       </div>
       <div style="display:flex;gap:4px;padding:6px 10px;border-top:1px solid var(--border)">
@@ -5299,6 +5298,22 @@ function copiarLinkArquivo(url) {
 // ANEXOS EM TAREFAS — Supabase Storage pasta /tarefas/{id}/
 // ═══════════════════════════════════════════════════════════════════
 
+// Input de arquivo global para anexos de tarefas
+function triggerAnexoInput(tarefaId) {
+  let inp = document.getElementById('_anexoInputGlobal');
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type = 'file';
+    inp.id = '_anexoInputGlobal';
+    inp.multiple = true;
+    inp.accept = '.pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp,.mp4,.mp3,.wav,.zip,.txt';
+    inp.style.display = 'none';
+    document.body.appendChild(inp);
+  }
+  inp.onchange = () => { if (inp.files?.length) uploadAnexoTarefa(tarefaId, inp.files); inp.value=''; };
+  inp.click();
+}
+
 async function carregarAnexosTarefa(tarefaId) {
   const box = document.getElementById('anexosBox');
   if (!box) return;
@@ -5315,7 +5330,7 @@ async function carregarAnexosTarefa(tarefaId) {
           ? `<img src="${urlPub}" style="width:36px;height:36px;border-radius:6px;object-fit:cover">`
           : `<div style="width:36px;height:36px;border-radius:6px;background:${info.cor}18;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${info.ico}</div>`}
         <div style="flex:1;overflow:hidden">
-          <div style="font-size:11px;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</div>
+          <div style="font-size:11px;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name.replace(/^\d+_/, '')}</div>
           <div style="font-size:10px;color:var(--tx3)">${fmtBytes(f.metadata?.size)}</div>
         </div>
         <button onclick="window.open('${urlPub}','_blank')" style="background:var(--brand);border:none;border-radius:6px;padding:4px 10px;font-size:10px;color:#fff;cursor:pointer;font-weight:700">⬇</button>
