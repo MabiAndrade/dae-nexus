@@ -4052,8 +4052,7 @@ async function loadNotifs() {
     .eq('lida', false).order('created_at', { ascending: false });
   notifs = data || [];
   const cnt = document.getElementById('alertCount');
-  if (cnt) cnt.textContent = notifs.length || '';
-  cnt.style.display = notifs.length ? 'flex' : 'none';
+  if (cnt) { cnt.textContent = notifs.length || ''; cnt.style.display = notifs.length ? 'flex' : 'none'; }
 }
 
 function renderAll() {
@@ -4077,7 +4076,7 @@ function renderAll() {
   const nome = (curUser?.nome?.split(' ')[0] || curUser?.av || 'Você').toUpperCase();
   const wname = document.getElementById('wname');
   if (wname) wname.textContent = (h<12?'BOM DIA':h<18?'BOA TARDE':'BOA NOITE') + `, ${nome}`;
-  document.getElementById('wdate').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var _wd=document.getElementById('wdate');if(_wd)_wd.textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   renderDashInteligente();
   renderUrgent(); renderAct(); renderFeriasMini();
   try{renderHierarquia();}catch(e){} try{renderProj();}catch(e){} try{renderTasks();}catch(e){} try{renderMeet();}catch(e){} try{renderMembers();}catch(e){} try{renderFerias();}catch(e){} try{renderCarga();}catch(e){} try{renderRiscos();}catch(e){} try{renderNova();}catch(e){} try{popSels();}catch(e){}
@@ -9378,11 +9377,7 @@ async function entrarNoApp(usuario) {
   if (ls) ls.style.display = 'none';
   // Mostrar o app — tenta mainApp primeiro, depois body-wrap
   const ma = document.getElementById('mainApp') || document.getElementById('body-wrap');
-  if (ma) {
-    ma.style.display = 'flex';
-    ma.style.flexDirection = 'column';
-    if (ma.id === 'body-wrap') ma.style.height = '100vh';
-  }
+  if (ma) { ma.style.display = 'block'; }
   try { await loadAll(); } catch(e) { console.error(e); }
   showLoading(false);
   // Garantir nome correto no dashboard
