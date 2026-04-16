@@ -3747,7 +3747,15 @@ function sw(name, el) {
     config:  () => { try{renderCadastros();}catch(e){} try{updateSelects();}catch(e){} },
     chat:    () => { const cw=document.getElementById('chatWin'); const ce=document.getElementById('chatEmpty'); if(!curChId){if(cw)cw.style.display='none';if(ce)ce.style.display='flex';} }
   };
-  setTimeout(() => { if (renders[name]) renders[name](); }, 30);
+  // Resetar scroll antes de renderizar
+  const _c = document.querySelector('.content');
+  if (_c) _c.scrollTop = 0;
+  setTimeout(() => { 
+    if (renders[name]) renders[name]();
+    // Garantir scroll no topo após render
+    const _c2 = document.querySelector('.content');
+    if (_c2) _c2.scrollTop = 0;
+  }, 30);
 }
 
 // ── CHART DASHBOARD ───────────────────────────────────────────────
@@ -9390,6 +9398,11 @@ async function entrarNoApp(usuario) {
   renderAll();
   sw('home', document.querySelector('.ni.on'));
   try { renderNova(); } catch(e) {}
+  // Forçar scroll no topo
+  setTimeout(() => {
+    const _c = document.querySelector('.content');
+    if (_c) _c.scrollTop = 0;
+  }, 500);
   // Iniciar listener global de mensagens
   setTimeout(() => { iniciarChatGlobal(); pedirPermissaoNotif(); }, 1000);
 }
