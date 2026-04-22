@@ -2459,7 +2459,7 @@ select.sel{
     <!-- ESTAÇÕES -->
     <div class="tab" id="t-proj">
       <div class="page-header">
-        <div class="page-title">Estações &amp; Setores</div>
+        <div class="page-title" id="proj-page-title">Estações &amp; Setores</div>
         <div class="page-sub">Hierarquia de estações, setores e projetos</div>
       </div>
       <div class="ph">
@@ -3786,7 +3786,7 @@ function sw(name, el) {
     home:    () => { try{renderDashInteligente();}catch(e){} try{renderUrgent();}catch(e){} try{renderAct();}catch(e){} try{renderFeriasMini();}catch(e){} },
     arquivos: () => { try{renderArquivos();}catch(e){console.error('renderArquivos',e)} },
     tasks:   () => { try{renderTasks();}catch(e){console.error('renderTasks',e)} },
-    proj:    () => { try{renderHierarquia();}catch(e){} },
+    proj:    () => { try{renderHierarquia();}catch(e){} const _pt=document.getElementById('proj-page-title');if(_pt)_pt.textContent='Estações & Setores'; },
     meet:    () => { try{renderMeet();}catch(e){} },
     team:    () => { 
       try{renderMembers();}catch(e){}
