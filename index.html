@@ -2465,7 +2465,7 @@ select.sel{
     <div class="tab" id="t-proj">
       <div class="page-header">
         <div class="page-title">Estações &amp; Espaços</div>
-        <div class="page-sub">Hierarquia de estações, espaços e projetos</div>
+        <div class="page-sub">Hierarquia de estações, setores e projetos</div>
       </div>
       <div class="ph">
         <div>
@@ -2474,7 +2474,7 @@ select.sel{
         </div>
         <div style="display:flex;gap:8px">
           <button class="btnadd" onclick="openM('mEstacao')">+ ESTAÇÃO</button>
-          <button class="btnadd" onclick="openM('mEspaco')">+ ESPAÇO</button>
+          <button class="btnadd" onclick="openM('mEspaco')">+ SETOR</button>
         </div>
       </div>
 
@@ -3400,7 +3400,7 @@ select.sel{
 <!-- MODAL: NOVA ESTAÇÃO (pai/macro, ex: DAE) -->
 <div class="ov" id="mEstacao"><div class="modal">
   <div class="mhandle"></div><div class="mtitle">NOVA ESTAÇÃO</div>
-  <p style="font-size:12px;color:var(--tx3);margin-bottom:16px">A estação é o agrupador principal (ex: DAE). Dentro dela ficam os espaços (setores).</p>
+  <p style="font-size:12px;color:var(--tx3);margin-bottom:16px">A estação é o agrupador principal (ex: DAE). Dentro dela ficam os setores (setores).</p>
   <label class="lbl">Nome da Estação</label><input class="inp" placeholder="Ex: DAE, Comercial, TI..." id="mEstacaoNomeNovo">
   <button class="btnp" onclick="saveNovaEstacao()">CRIAR ESTAÇÃO</button>
   <button class="btncanc" onclick="closeM('mEstacao')">Cancelar</button>
@@ -3411,7 +3411,7 @@ select.sel{
   <div class="mhandle"></div><div class="mtitle" id="mEspacoTitle">NOVO ESPAÇO</div>
   <input type="hidden" id="mEspacoId">
   <label class="lbl">Nome do Espaço</label><input class="inp" placeholder="Ex: NOVOS SISTEMAS, SIAFIC..." id="mEspacoNome">
-  <label class="lbl">Descrição</label><textarea class="ta" placeholder="Descreva o espaço..." id="mEspacoDesc"></textarea>
+  <label class="lbl">Descrição</label><textarea class="ta" placeholder="Descreva o setor..." id="mEspacoDesc"></textarea>
   <label class="lbl">Estação</label>
   <select class="sel" id="mEspacoEstacao"><option value="">Selecione a estação...</option></select>
   <label class="lbl">Ícone</label>
@@ -3479,7 +3479,7 @@ select.sel{
   <div class="mhandle"></div>
   <div class="mtitle" id="mMembrosEspacoTitle">👥 MEMBROS DO ESPAÇO</div>
   <input type="hidden" id="mMembrosEspacoId">
-  <div style="font-size:11px;color:var(--tx3);margin-bottom:12px">Selecione quem faz parte deste espaço e participará do canal de chat.</div>
+  <div style="font-size:11px;color:var(--tx3);margin-bottom:12px">Selecione quem faz parte deste setor e participará do canal de chat.</div>
   <div id="mMembrosEspacoLista" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;margin-bottom:16px"></div>
   <button class="btnp" onclick="salvarMembrosEspaco()">💾 SALVAR MEMBROS</button>
   <button class="btncanc" onclick="closeM('mMembrosEspaco')">Cancelar</button>
@@ -3498,7 +3498,7 @@ select.sel{
     <div>
       <label class="lbl">Espaço</label>
       <select class="sel" id="ntEspaco" onchange="filtrarProjetosPorEspaco()">
-        <option value="">Selecione o espaço...</option>
+        <option value="">Selecione o setor...</option>
       </select>
     </div>
   </div>
@@ -3783,7 +3783,7 @@ function sw(name, el) {
   if (!tabEl) return;
   tabEl.classList.add('on');
   if (el) el.classList.add('on');
-  const titles = {home:'Dashboard',proj:'Estações & Espaços',tasks:'Tarefas',chat:'Chat',meet:'Agenda',risk:'Radar da Operação',gantt:'Timeline',painel:'Painel Estratégico',nova:'Nova IA',team:'Equipe',config:'Cadastros',arquivos:'Arquivos & Documentos'};
+  const titles = {home:'Dashboard',proj:'Estações & Setores',tasks:'Tarefas',chat:'Chat',meet:'Agenda',risk:'Radar da Operação',gantt:'Timeline',painel:'Painel Estratégico',nova:'Nova IA',team:'Equipe',config:'Cadastros',arquivos:'Arquivos & Documentos'};
   const ttEl = document.getElementById('topbar-page-title');
   if (ttEl) ttEl.textContent = titles[name] || '';
   // Renderizar aba ativa
@@ -4155,7 +4155,7 @@ function renderChatCanais() {
   const lista = document.getElementById('chatCanaisList');
   if (!lista) return;
   if (!espacos.length) {
-    lista.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,.3);padding:6px 8px">Nenhum espaço criado</div>';
+    lista.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,.3);padding:6px 8px">Nenhum setor criado</div>';
     return;
   }
   const cores = ['rgba(16,185,129,0.15)','rgba(59,130,246,0.15)','rgba(139,92,246,0.15)','rgba(245,158,11,0.15)','rgba(236,72,153,0.15)','rgba(239,68,68,0.15)'];
@@ -4167,7 +4167,7 @@ function renderChatCanais() {
       <div class="chat-canal-ic" style="background:${cor}">${ic}</div>
       <div class="chat-canal-info">
         <div class="chat-canal-nome">${e.nome}</div>
-        <div class="chat-canal-preview" id="prev-${canalId}">${e.estacao} · Canal do espaço</div>
+        <div class="chat-canal-preview" id="prev-${canalId}">${e.estacao} · Canal do setor</div>
       </div>
       <div class="chat-canal-meta"><div class="chat-canal-time" id="time-${canalId}"></div></div>
     </div>`;
@@ -4473,6 +4473,10 @@ async function delProj(id) {
 }
 
 // ── Excluir Estação ──────────────────────────────────────────────
+function excluirEstacaoNome(btn) {
+  const nome = btn.getAttribute('data-est');
+  if (nome) excluirEstacao(nome);
+}
 function excluirEstacao(nome) {
   const setoresEst = espacos.filter(e => (e.estacao||'').trim().toLowerCase() === nome.trim().toLowerCase());
   const projEst = proj.filter(p => setoresEst.some(s => s.id === p.espaco_id) || (p.dept||'').trim().toLowerCase() === nome.trim().toLowerCase());
@@ -4500,6 +4504,11 @@ function excluirEstacao(nome) {
 }
 
 // ── Excluir Espaço/Setor ─────────────────────────────────────────
+function excluirEspacoById(id) {
+  const setor = espacos.find(e => e.id === id);
+  if (!setor) return;
+  excluirEspaco(id, setor.nome);
+}
 async function excluirEspaco(id, nome) {
   const projSetor = proj.filter(p => p.espaco_id === id);
   const msg = `Excluir o setor "${nome}"?\n\nIsso também vai excluir ${projSetor.length} projeto(s).\n\nEssa ação não pode ser desfeita.`;
@@ -5573,7 +5582,7 @@ function openCh(id, icon, name, tipo, cor) {
     avEl.style.color = 'transparent';
     avEl.style.fontSize = '18px';
     avEl.className = 'chat-win-av';
-    subEl.textContent = tipoReal === 'geral' ? 'Canal geral da equipe' : 'Canal do espaço';
+    subEl.textContent = tipoReal === 'geral' ? 'Canal geral da equipe' : 'Canal do setor';
   }
   document.getElementById('chName').textContent = nomeReal;
 
@@ -8540,7 +8549,7 @@ function renderHierarquia() {
     h += '<div class="setor-sub">'+setores.length+' setor'+(setores.length!==1?'es':'')+' · '+projEstacao.length+' projeto'+(projEstacao.length!==1?'s':'')+' · '+ativsEstacao.length+' atividade'+(ativsEstacao.length!==1?'s':'')+'</div></div>';
     h += '<div style="display:flex;gap:6px;flex-shrink:0">';
     h += '<button class="setor-btn-add" onclick="abrirNovoEspaco(\''+estacao.replace(/'/g,"\\'")+'\')" style="flex-shrink:0">+ Setor</button>';
-    h += '<button onclick="excluirEstacao(\''+estacao.replace(/'/g,"\\'")+'\')" style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,.2);border:none;color:#fff;cursor:pointer;font-size:14px;flex-shrink:0;" title="Excluir estação">🗑</button>';
+    h += '<button onclick="excluirEstacaoNome(this)" data-est="'+estacao+'" style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,.2);border:none;color:#fff;cursor:pointer;font-size:14px;flex-shrink:0;" title="Excluir estação">🗑</button>';
     h += '</div>';
     h += '</div>';
     h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;position:relative;z-index:1;">';
@@ -8582,7 +8591,7 @@ function renderHierarquia() {
       h += '<button onclick="abrirNovaAtivSetor(\''+setor.id+'\',\''+setor.nome.replace(/'/g,"\\'")+'\')" style="padding:6px 12px;border-radius:8px;background:#10B981;color:#fff;border:none;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;">⚡ + Atividade</button>';
       h += '<span onclick="gerenciarMembrosEspaco(\''+setor.id+'\',\''+setor.nome.replace(/'/g,"\\'")+'\')" style="width:30px;height:30px;border-radius:8px;background:#F1F5F9;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;" title="Membros">👥</span>';
       h += '<span onclick="editarEspaco(\''+setor.id+'\')" style="width:30px;height:30px;border-radius:8px;background:#F1F5F9;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;" title="Editar">✏️</span>';
-      h += '<span onclick="excluirEspaco(\''+setor.id+'\',\''+setor.nome.replace(/'/g,"\\'")+'\')" style="width:30px;height:30px;border-radius:8px;background:#FEF2F2;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;" title="Excluir setor">🗑️</span>';
+      h += '<span onclick="excluirEspacoById(\''+setor.id+'\')" style="width:30px;height:30px;border-radius:8px;background:#FEF2F2;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;" title="Excluir setor">🗑️</span>';
       h += '</div></div>';
 
       // Projetos do setor
@@ -8827,13 +8836,13 @@ async function salvarMembrosEspaco() {
   }
   closeM('mMembrosEspaco');
   renderChatCanais();
-  showToast(`✅ ${selecionados.length} membro(s) salvos no espaço!`);
+  showToast(`✅ ${selecionados.length} membro(s) salvos no setor!`);
 }
 
 async function saveEspaco() {
   const nome = document.getElementById('mEspacoNome').value.trim();
   const estacao = document.getElementById('mEspacoEstacao').value;
-  if (!nome) { showToast('⚠️ Digite o nome do espaço'); return; }
+  if (!nome) { showToast('⚠️ Digite o nome do setor'); return; }
   if (!estacao) { showToast('⚠️ Selecione a estação'); return; }
   const id = document.getElementById('mEspacoId').value;
   const desc = document.getElementById('mEspacoDesc').value.trim();
@@ -8893,7 +8902,7 @@ function popTaskEstacoes() {
   ])].sort();
   sel.innerHTML = '<option value="">Selecione a estação...</option>' +
     estacoes.map(e => `<option value="${e}">${e}</option>`).join('');
-  document.getElementById('ntEspaco').innerHTML = '<option value="">Selecione o espaço...</option>';
+  document.getElementById('ntEspaco').innerHTML = '<option value="">Selecione o setor...</option>';
   document.getElementById('ntPj').innerHTML = '<option value="">Selecione o projeto...</option>';
 }
 
@@ -8901,11 +8910,11 @@ function filtrarEspacosPorEstacao() {
   const estacao = document.getElementById('ntEstacao').value;
   const espSel = document.getElementById('ntEspaco');
   const projSel = document.getElementById('ntPj');
-  espSel.innerHTML = '<option value="">Selecione o espaço...</option>';
+  espSel.innerHTML = '<option value="">Selecione o setor...</option>';
   projSel.innerHTML = '<option value="">Selecione o projeto...</option>';
   if (!estacao) return;
   const espacosFiltrados = espacos.filter(e => e.estacao === estacao);
-  espSel.innerHTML = '<option value="">Selecione o espaço...</option>' +
+  espSel.innerHTML = '<option value="">Selecione o setor...</option>' +
     espacosFiltrados.map(e => `<option value="${e.id}">${e.icone||'📁'} ${e.nome}</option>`).join('');
   // Se não há espaços, mostrar projetos diretamente pelo dept
   if (!espacosFiltrados.length) {
@@ -9359,7 +9368,7 @@ function popSels() {
   document.getElementById('nrP').innerHTML = '<option value="">Selecione o projeto...</option>' + projValidos.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
   document.getElementById('nrR').innerHTML = memb.map(m=>`<option value="${m.av}">${m.nome}</option>`).join('');
   const espSel = document.getElementById('npEspaco');
-  if (espSel) espSel.innerHTML = '<option value="">Selecione o espaço...</option>' + espacos.map(e=>`<option value="${e.id}">${e.estacao} › ${e.nome}</option>`).join('');
+  if (espSel) espSel.innerHTML = '<option value="">Selecione o setor...</option>' + espacos.map(e=>`<option value="${e.id}">${e.estacao} › ${e.nome}</option>`).join('');
   const estSel = document.getElementById('mEspacoEstacao');
   if (estSel) estSel.innerHTML = '<option value="">Selecione a estação...</option>' + cadastros.estacao.map(s=>`<option value="${s}">${s}</option>`).join('');
 }
